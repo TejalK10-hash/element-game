@@ -1,69 +1,74 @@
-# Element Navigator 🚀⚛
+# 🧬 Element Navigator: Connect the Tech
 
-A browser-based educational maze game where you guide element-astronauts to their correct space stations — learning how each element powers cutting-edge technology along the way.
+A browser-based educational game where you drag real space-tech elements onto the part of a spacecraft that actually uses them — and learn the engineering reason behind each one.
 
-Built for the [Hack Club Stardance Challenge](https://stardance.hackclub.com) in partnership with NASA.
+![Status](https://img.shields.io/badge/status-in--progress-yellow) ![Made with](https://img.shields.io/badge/made%20with-HTML%2FCSS%2FJS-blue)
 
-## 🎮 How to Play
+---
 
-1. Pick a domain (Space, Underwater, Underground, Earth)
-2. An astronaut named after a chemical element appears
-3. Navigate the maze using **arrow keys**, **WASD**, or **click/tap**
-4. Find the correct space station that matches your element's technology
-5. Read the science fact after each level
-6. Complete all 10 elements to finish the domain!
+## What is this?
 
-## 🚀 Run Locally
+Every element on the spacecraft is a real material used in actual space technology. Xenon isn't just a noble gas — it's literally the fuel NASA's Dawn probe used in its ion thrusters. Titanium isn't just "strong metal" — it's why rocket hulls survive the stress of launch.
 
-Just open `index.html` in your browser — no server or npm required.
+**Element Navigator** turns that into a game: drag (or tap) an element badge onto the matching spacecraft hotspot. Get it right, and you unlock a real fact about why that element matters. Get all four, and you walk away knowing more material science than when you started — without it feeling like a lesson.
 
-For best experience, use the **Live Server** extension in VS Code:
-- Right-click `index.html` → "Open with Live Server"
+## How to play
 
-## 🗂 Project Structure
+1. Open the game in your browser.
+2. Pick an element badge at the bottom of the screen (Silicon, Neodymium, Xenon, or Titanium).
+3. Either:
+   - **Drag** a line from the badge to the matching glowing hotspot on the spacecraft, or
+   - **Tap** the badge to select it, then **tap** the hotspot you think it belongs to.
+4. Correct match → +20 points and a fact card about that element.
+5. Wrong match → −5 points, and a hint about what that hotspot is actually for.
+6. Match all four elements to win and see the full glossary.
+
+## Elements in this version
+
+| Element | Symbol | Spacecraft Part | Real-World Use |
+|---|---|---|---|
+| Xenon | Xe | Thrusters | Ion thruster propellant — used in missions like NASA's Dawn spacecraft |
+| Titanium | Ti | Hull | Rocket airframes & spacecraft hulls — high strength-to-weight ratio |
+| Silicon | Si | Solar Panels | The semiconductor at the core of photovoltaic cells, like the ISS's solar arrays |
+| Neodymium | Nd | Attitude Control Magnets | Powers reaction wheels & magnetorquers for spacecraft orientation |
+
+## Running it locally
+
+No build step, no dependencies — just open it.
+
+**Option 1 — Just open the file**
+```
+Double-click index.html
+```
+
+**Option 2 — Run a local server (recommended for development)**
+```bash
+npx serve
+```
+or use the **Live Server** extension in VS Code (right-click `index.html` → "Open with Live Server").
+
+## Project structure
 
 ```
-element-navigator/
-├── index.html      ← Game screens & layout
-├── style.css       ← Visual design (space dark theme)
-├── data.js         ← All element data, facts, domain config
-├── game.js         ← Canvas engine: maze gen, movement, rendering
-└── assets/
-    ├── astronauts/ ← (optional) custom astronaut sprites per element
-    └── stations/   ← (optional) custom station images per domain
+element-game/
+├── index.html   # Page structure + inline SVG scene (spacecraft, hotspots, badges)
+├── style.css    # Visual styling, gradients, animations
+├── game.js      # Game logic — drag/tap matching, scoring, modals
+├── data.js      # Element data — names, facts, correct hotspot mappings
+└── README.md    # You're here
 ```
 
-## ➕ Adding New Domains
+## Tech
 
-In `data.js`, add a new key to the `DOMAINS` object following the same structure as `space`. Then in `index.html`, change the domain card from `locked` to `unlocked` and wire up the `onclick`.
+Vanilla HTML, CSS, and JavaScript. No frameworks, no build tools. The entire spacecraft scene is a single inline SVG, which keeps the artwork, hotspots, and badge positions in one shared coordinate space — no fighting CSS layout to line things up.
 
-## 🧪 Elements Covered
+## Roadmap
 
-### Space Domain (v1)
-| Symbol | Element | Technology |
-|--------|---------|-----------|
-| Xe | Xenon | Ion thrusters (NASA Dawn, ESA BepiColombo) |
-| Ti | Titanium | Rocket airframes & spacecraft hulls |
-| Si | Silicon | Satellite solar panels & ISS power |
-| O  | Oxygen | Liquid oxygen rocket oxidizer & life support |
-| H  | Hydrogen | Liquid hydrogen fuel (SLS, Falcon 9) |
-| Al | Aluminium | Spacecraft structural components |
-| Pu | Plutonium | RTG power (Voyager, Perseverance) |
-| He | Helium | Tank pressurization & magnet cooling |
-| Au | Gold | Thermal radiation shielding & visor coating |
-| Nd | Neodymium | Reaction wheels for satellite attitude control |
+- [ ] Swap in an illustrated/raster rocket image as an alternative to the procedural SVG
+- [ ] Add more elements and spacecraft parts
+- [ ] New domains beyond spacecraft — submarines, underground drills, and other extreme-engineering settings, each with their own element set
+- [ ] Shuffle mode — hotspot positions randomize so memorization isn't a shortcut
 
-### Coming Soon
-- 🌊 Underwater (8 elements)
-- ⛏️ Underground (8 elements)
-- 🌱 Earth & Environment (6 elements)
+## Credits
 
-## 🛠 Built With
-
-- Vanilla HTML, CSS, JavaScript — no frameworks
-- Canvas 2D API for game rendering
-- Recursive backtracker algorithm for maze generation
-
-## 📄 License
-
-Open source — MIT
+Built solo as a personal project. Spacecraft illustration and game logic created from scratch in inline SVG/CSS/JS.
