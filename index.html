@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Element Navigator: Connect the Tech</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="topbar">
+<div class="brand">🧬 Element Navigator</div>
+<div class="stats">
+<span>Score: <b id="scoreVal">0</b></span>
+<span>Matched: <b id="matchVal">0</b>/<span id="totalVal">0</span></span>
+</div>
+<button id="resetBtn">🔁 Reset</button>
+</header>
+
+<p id="instructions">
+    Drag a line from each <b>element</b> to the part of the spacecraft that uses it &mdash; or tap an element, then tap the matching part.
+</p>
+
+<main id="board">
+<div id="stars"></div>
+
+<svg id="scene" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" touch-action="none">
+
+<defs>
+<!-- hull: lit from upper-left, dark underside -> classic 3D tube shading -->
+<linearGradient id="gradHull" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%"  stop-color="#eaf6ff"/>
+<stop offset="22%" stop-color="#9fd6f5"/>
+<stop offset="55%" stop-color="#4f8fb8"/>
+<stop offset="100%" stop-color="#193b52"/>
+</linearGradient>
+
+<radialGradient id="gradNoseTip" cx="30%" cy="35%" r="80%">
+<stop offset="0%" stop-color="#ffffff"/>
+<stop offset="40%" stop-color="#a9def5"/>
+<stop offset="100%" stop-color="#1c3a52"/>
+</radialGradient>
+
+<linearGradient id="gradWingTop" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%"  stop-color="#e8d6ff"/>
+<stop offset="35%" stop-color="#b08af0"/>
+<stop offset="100%" stop-color="#4a2e85"/>
+</linearGradient>
+<linearGradient id="gradWingBottom" x1="0%" y1="100%" x2="100%" y2="0%">
+<stop offset="0%"  stop-color="#3a2566"/>
+<stop offset="55%" stop-color="#8a63cf"/>
+<stop offset="100%" stop-color="#dcc8ff"/>
+</linearGradient>
+
+<radialGradient id="gradEngine" cx="40%" cy="30%" r="75%">
+<stop offset="0%" stop-color="#dff3ff"/>
+<stop offset="50%" stop-color="#5fa8cf"/>
+<stop offset="100%" stop-color="#102a3d"/>
+</radialGradient>
+
+<radialGradient id="gradFlame" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#fff7d6"/>
+<stop offset="40%" stop-color="#ffb347"/>
+<stop offset="75%" stop-color="#ff6a3d"/>
+<stop offset="100%" stop-color="#ff6a3d" stop-opacity="0"/>
+</radialGradient>
+
+<linearGradient id="gradModule" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" stop-color="#f6f0ff"/>
+<stop offset="50%" stop-color="#c4a9f5"/>
+<stop offset="100%" stop-color="#5b3d96"/>
+</linearGradient>
+
+<linearGradient id="gradWindow" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#ffffff"/>
+<stop offset="50%" stop-color="#8fe6ff"/>
+<stop offset="100%" stop-color="#0c6e96"/>
+</linearGradient>
+
+<filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+<feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000814" flood-opacity="0.55"/>
+</filter>
+
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+<feGaussianBlur stdDeviation="6" result="blur"/>
+<feMerge>
+<feMergeNode in="blur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+
+<!-- decorative orbit ring -->
+<ellipse cx="500" cy="265" rx="430" ry="170" class="orbitRing"/>
+<!-- decorative distant planet -->
+<circle cx="905" cy="540" r="40" class="planet"/>
+<circle cx="60" cy="90" r="18" class="planet planet--small"/>
+
+<!-- ===================== CRAFT (3D-shaded) ===================== -->
+<g id="craft" filter="url(#softShadow)">
+
+<!-- bottom solar wing (decorative mirror), tilted panel w/ gradient + cell lines -->
+<polygon points="420,300 358,402 542,402 480,300" class="wing wingBottom"/>
+<line x1="398" y1="343" x2="522" y2="343" class="wingLine"/>
+<line x1="408" y1="373" x2="507" y2="373" class="wingLine"/>
+<line x1="450" y1="300" x2="412" y2="402" class="wingLineCross"/>
+<line x1="450" y1="300" x2="488" y2="402" class="wingLineCross"/>
+
+<!-- top solar wing (interactive: silicon) -->
+<polygon points="420,230 358,128 542,128 480,230" class="wing wingTop"/>
+<line x1="398" y1="187" x2="522" y2="187" class="wingLine"/>
+<line x1="408" y1="157" x2="507" y2="157" class="wingLine"/>
+<line x1="450" y1="230" x2="412" y2="128" class="wingLineCross"/>
+<line x1="450" y1="230" x2="488" y2="128" class="wingLineCross"/>
+
+<!-- engine block + nozzle (rounded 3D cylinder look) -->
+<ellipse cx="262" cy="265" rx="6" ry="22" class="engineCap"/>
+<rect x="262" y="243" width="42" height="44" rx="4" class="engineBlock"/>
+<ellipse cx="304" cy="265" rx="6" ry="22" class="engineCapFront"/>
+<polygon points="262,253 220,262 220,268 262,277" class="flameCore"/>
+<ellipse cx="208" cy="265" rx="26" ry="16" class="flameGlow"/>
+
+<!-- main hull / fuselage as a 3D tube: two end-caps (ellipses) + gradient-shaded rect -->
+<rect x="300" y="230" width="400" height="70" rx="35" class="hullBody"/>
+<ellipse cx="300" cy="265" rx="14" ry="35" class="hullCapBack"/>
+<ellipse cx="700" cy="265" rx="14" ry="35" class="hullCapFront"/>
+<ellipse cx="478" cy="252" rx="170" ry="10" class="hullHighlight"/>
+<circle cx="480" cy="265" r="17" class="window"/>
+<circle cx="475" cy="259" r="5" class="windowGleam"/>
+
+<!-- nose cone, gradient-shaded for a rounded 3D tip -->
+<polygon points="700,230 786,265 700,300" class="nose"/>
+<ellipse cx="700" cy="265" rx="14" ry="35" class="noseBase"/>
+<ellipse cx="752" cy="258" rx="22" ry="7" class="noseHighlight"/>
+
+<!-- control module + antenna (interactive: neodymium) -->
+<line x1="625" y1="230" x2="625" y2="188" class="strut"/>
+<rect x="600" y="160" width="50" height="28" rx="6" class="module"/>
+<ellipse cx="612" cy="168" rx="10" ry="5" class="moduleHighlight"/>
+<line x1="625" y1="160" x2="625" y2="134" class="strut"/>
+<circle cx="625" cy="130" r="4.5" class="antennaTip"/>
+</g>
+
+<!-- ===================== CONNECTIONS (drawn by JS) ===================== -->
+<g id="connections"></g>
+<line id="dragLine" x1="0" y1="0" x2="0" y2="0" class="dragLine" visibility="hidden"/>
+
+<!-- ===================== HOTSPOTS ===================== -->
+<g id="hotspots">
+<g class="hotspot" data-target="thruster">
+<circle cx="245" cy="263" r="14" class="hotspotRing"/>
+<circle cx="245" cy="263" r="6" class="hotspotDot"/>
+<text x="245" y="312" class="hotspotLabel">Thrusters</text>
+</g>
+<g class="hotspot" data-target="hull">
+<circle cx="560" cy="265" r="14" class="hotspotRing"/>
+<circle cx="560" cy="265" r="6" class="hotspotDot"/>
+<text x="560" y="314" class="hotspotLabel">Hull</text>
+</g>
+<g class="hotspot" data-target="solarpanel">
+<circle cx="460" cy="165" r="14" class="hotspotRing"/>
+<circle cx="460" cy="165" r="6" class="hotspotDot"/>
+<text x="460" y="108" class="hotspotLabel">Solar Panels</text>
+</g>
+<g class="hotspot" data-target="magnets">
+<circle cx="625" cy="174" r="14" class="hotspotRing"/>
+<circle cx="625" cy="174" r="6" class="hotspotDot"/>
+<text x="660" y="178" class="hotspotLabel" text-anchor="start">Magnets</text>
+</g>
+</g>
+
+<!-- ===================== BADGES ===================== -->
+<g id="badges">
+<g class="badge" data-id="silicon" data-symbol="Si" transform="translate(160,545)">
+<circle r="36" class="badgeCircle" style="--c:#facc15"/>
+<text class="badgeSymbol">Si</text>
+<text y="54" class="badgeName">Silicon</text>
+</g>
+<g class="badge" data-id="neodymium" data-symbol="Nd" transform="translate(386,545)">
+<circle r="36" class="badgeCircle" style="--c:#c084fc"/>
+<text class="badgeSymbol">Nd</text>
+<text y="54" class="badgeName">Neodymium</text>
+</g>
+<g class="badge" data-id="xenon" data-symbol="Xe" transform="translate(614,545)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Xe</text>
+<text y="54" class="badgeName">Xenon</text>
+</g>
+<g class="badge" data-id="titanium" data-symbol="Ti" transform="translate(840,545)">
+<circle r="36" class="badgeCircle" style="--c:#cbd5e1"/>
+<text class="badgeSymbol">Ti</text>
+<text y="54" class="badgeName">Titanium</text>
+</g>
+</g>
+
+</svg>
+</main>
+
+<!-- FACT MODAL -->
+<div class="overlay" id="factOverlay">
+<div class="modal">
+<div id="factHead"></div>
+<div class="factCard" id="factCard"></div>
+<button class="btn" id="factContinueBtn">Continue →</button>
+</div>
+</div>
+
+<!-- WIN MODAL -->
+<div class="overlay" id="winOverlay">
+<div class="modal">
+<h1>🏆 All Elements Matched!</h1>
+<p class="sub">Final score: <b id="finalScore">0</b></p>
+<div id="winGlossary"></div>
+<button class="btn" id="playAgainBtn">🔁 Play Again</button>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
