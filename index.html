@@ -13,12 +13,20 @@
 <div class="stats">
 <span>Score: <b id="scoreVal">0</b></span>
 <span>Matched: <b id="matchVal">0</b>/<span id="totalVal">0</span></span>
+<span class="levelsDone">Levels: <b id="levelsDoneVal">0</b>/<span id="levelsTotalVal">4</span></span>
 </div>
 <button id="resetBtn">🔁 Reset</button>
 </header>
 
+<nav id="levelTabs">
+<button class="levelTab" data-level="rocket">🚀 Rocket</button>
+<button class="levelTab" data-level="shuttle">🛰️ Space Shuttle</button>
+<button class="levelTab" data-level="jet">✈️ Fighter Jet</button>
+<button class="levelTab" data-level="probe">🔭 Space Probe</button>
+</nav>
+
 <p id="instructions">
-    Drag a line from each <b>element</b> to the part of the spacecraft that uses it &mdash; or tap an element, then tap the matching part.
+    Drag a line from each <b>element</b> to the part of the <span id="craftNameLabel">spacecraft</span> that uses it &mdash; or tap an element, then tap the matching part.
 </p>
 
 <main id="board">
@@ -88,108 +96,230 @@
 <feMergeNode in="SourceGraphic"/>
 </feMerge>
 </filter>
+
+<!-- shared clip circle for every badge's material photo. It's
+     defined once at local origin (0,0) and reused by every badge
+     group — each badge's own translate() puts it in the right
+     spot on the board. -->
+<clipPath id="badgeClip">
+<circle cx="0" cy="0" r="34"/>
+</clipPath>
 </defs>
 
 <!-- decorative orbit ring -->
-<ellipse cx="500" cy="265" rx="430" ry="170" class="orbitRing"/>
-<!-- decorative distant planet -->
-<circle cx="905" cy="540" r="40" class="planet"/>
+<ellipse cx="500" cy="300" rx="440" ry="180" class="orbitRing"/>
+<circle cx="905" cy="560" r="40" class="planet"/>
 <circle cx="60" cy="90" r="18" class="planet planet--small"/>
 
-<!-- ===================== CRAFT (3D-shaded) ===================== -->
-<g id="craft" filter="url(#softShadow)">
-
-<!-- bottom solar wing (decorative mirror), tilted panel w/ gradient + cell lines -->
-<polygon points="420,300 358,402 542,402 480,300" class="wing wingBottom"/>
-<line x1="398" y1="343" x2="522" y2="343" class="wingLine"/>
-<line x1="408" y1="373" x2="507" y2="373" class="wingLine"/>
-<line x1="450" y1="300" x2="412" y2="402" class="wingLineCross"/>
-<line x1="450" y1="300" x2="488" y2="402" class="wingLineCross"/>
-
-<!-- top solar wing (interactive: silicon) -->
-<polygon points="420,230 358,128 542,128 480,230" class="wing wingTop"/>
-<line x1="398" y1="187" x2="522" y2="187" class="wingLine"/>
-<line x1="408" y1="157" x2="507" y2="157" class="wingLine"/>
-<line x1="450" y1="230" x2="412" y2="128" class="wingLineCross"/>
-<line x1="450" y1="230" x2="488" y2="128" class="wingLineCross"/>
-
-<!-- engine block + nozzle (rounded 3D cylinder look) -->
-<ellipse cx="262" cy="265" rx="6" ry="22" class="engineCap"/>
-<rect x="262" y="243" width="42" height="44" rx="4" class="engineBlock"/>
-<ellipse cx="304" cy="265" rx="6" ry="22" class="engineCapFront"/>
-<polygon points="262,253 220,262 220,268 262,277" class="flameCore"/>
-<ellipse cx="208" cy="265" rx="26" ry="16" class="flameGlow"/>
-
-<!-- main hull / fuselage as a 3D tube: two end-caps (ellipses) + gradient-shaded rect -->
-<rect x="300" y="230" width="400" height="70" rx="35" class="hullBody"/>
-<ellipse cx="300" cy="265" rx="14" ry="35" class="hullCapBack"/>
-<ellipse cx="700" cy="265" rx="14" ry="35" class="hullCapFront"/>
-<ellipse cx="478" cy="252" rx="170" ry="10" class="hullHighlight"/>
-<circle cx="480" cy="265" r="17" class="window"/>
-<circle cx="475" cy="259" r="5" class="windowGleam"/>
-
-<!-- nose cone, gradient-shaded for a rounded 3D tip -->
-<polygon points="700,230 786,265 700,300" class="nose"/>
-<ellipse cx="700" cy="265" rx="14" ry="35" class="noseBase"/>
-<ellipse cx="752" cy="258" rx="22" ry="7" class="noseHighlight"/>
-
-<!-- control module + antenna (interactive: neodymium) -->
-<line x1="625" y1="230" x2="625" y2="188" class="strut"/>
-<rect x="600" y="160" width="50" height="28" rx="6" class="module"/>
-<ellipse cx="612" cy="168" rx="10" ry="5" class="moduleHighlight"/>
-<line x1="625" y1="160" x2="625" y2="134" class="strut"/>
-<circle cx="625" cy="130" r="4.5" class="antennaTip"/>
-</g>
-
-<!-- ===================== CONNECTIONS (drawn by JS) ===================== -->
-<g id="connections"></g>
+<!-- ===================== dragLine (shared) ===================== -->
 <line id="dragLine" x1="0" y1="0" x2="0" y2="0" class="dragLine" visibility="hidden"/>
 
-<!-- ===================== HOTSPOTS ===================== -->
-<g id="hotspots">
-<g class="hotspot" data-target="thruster">
-<circle cx="245" cy="263" r="14" class="hotspotRing"/>
-<circle cx="245" cy="263" r="6" class="hotspotDot"/>
-<text x="245" y="312" class="hotspotLabel">Thrusters</text>
+<!-- =========================================================
+         LEVEL 1: ROCKET
+         Photo: rocket.png
+    ========================================================== -->
+<g class="craftLevel" data-level="rocket">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="-30" width="950" height="620" rx="18"/>
+<text class="placeholderIcon" x="505" y="270">🚀</text>
+<text class="placeholderText" x="505" y="310">Add rocket.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="rocket.png" x="30" y="-30" width="950" height="700" opacity="0"/>
 </g>
-<g class="hotspot" data-target="hull">
-<circle cx="560" cy="265" r="14" class="hotspotRing"/>
-<circle cx="560" cy="265" r="6" class="hotspotDot"/>
-<text x="560" y="314" class="hotspotLabel">Hull</text>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="r_heatshield">
+<circle cx="307" cy="101" r="8" class="hotspotDot"/>
 </g>
-<g class="hotspot" data-target="solarpanel">
-<circle cx="460" cy="165" r="14" class="hotspotRing"/>
-<circle cx="460" cy="165" r="6" class="hotspotDot"/>
-<text x="460" y="108" class="hotspotLabel">Solar Panels</text>
+
+<g class="hotspot" data-target="r_airframe">
+<circle cx="491" cy="210" r="8" class="hotspotDot"/>
 </g>
-<g class="hotspot" data-target="magnets">
-<circle cx="625" cy="174" r="14" class="hotspotRing"/>
-<circle cx="625" cy="174" r="6" class="hotspotDot"/>
-<text x="660" y="178" class="hotspotLabel" text-anchor="start">Magnets</text>
+<g class="hotspot" data-target="r_propellant">
+<circle cx="525" cy="280" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="r_cooling">
+<circle cx="587" cy="335" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="r_nozzle">
+<circle cx="695" cy="392" r="8" class="hotspotDot"/>
 </g>
 </g>
 
-<!-- ===================== BADGES ===================== -->
-<g id="badges">
-<g class="badge" data-id="silicon" data-symbol="Si" transform="translate(160,545)">
-<circle r="36" class="badgeCircle" style="--c:#facc15"/>
-<text class="badgeSymbol">Si</text>
-<text y="54" class="badgeName">Silicon</text>
+<g class="badges">
+<g class="badge" data-id="r_alli" transform="translate(228,482)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
 </g>
-<g class="badge" data-id="neodymium" data-symbol="Nd" transform="translate(386,545)">
-<circle r="36" class="badgeCircle" style="--c:#c084fc"/>
-<text class="badgeSymbol">Nd</text>
-<text y="54" class="badgeName">Neodymium</text>
+<g class="badge" data-id="r_niobium" transform="translate(595,482)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
 </g>
-<g class="badge" data-id="xenon" data-symbol="Xe" transform="translate(614,545)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
-<text class="badgeSymbol">Xe</text>
-<text y="54" class="badgeName">Xenon</text>
+<g class="badge" data-id="r_copper" transform="translate(475,482)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
 </g>
-<g class="badge" data-id="titanium" data-symbol="Ti" transform="translate(840,545)">
-<circle r="36" class="badgeCircle" style="--c:#cbd5e1"/>
-<text class="badgeSymbol">Ti</text>
-<text y="54" class="badgeName">Titanium</text>
+<g class="badge" data-id="r_carbon" transform="translate(103,482)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="r_propellant" transform="translate(352,482)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 2: SPACE SHUTTLE
+         Photo: shuttle.png
+    ========================================================== -->
+<g class="craftLevel" data-level="shuttle">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderIcon" x="505" y="270">🛰️</text>
+<text class="placeholderText" x="505" y="310">Add shuttle.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="shuttle.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="s_nosecap">
+<circle cx="225" cy="105" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="s_fuselage">
+<circle cx="395" cy="199" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="s_upperwing">
+<circle cx="756" cy="295" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="s_fittings">
+<circle cx="713" cy="385" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="s_belly">
+<circle cx="373" cy="320" r="8" class="hotspotDot"/>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="s_rcc" transform="translate(100,475)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="s_silica" transform="translate(346,475)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="s_aluminum" transform="translate(223,475)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="s_inconel" transform="translate(469,475)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="s_nomex" transform="translate(590,475)">
+<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 3: FIGHTER JET
+         Photo: jet.png
+    ========================================================== -->
+<g class="craftLevel" data-level="jet">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderIcon" x="505" y="270">📡</text>
+<text class="placeholderText" x="505" y="310">Add jet.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="jet.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="hyp_leading_edge">
+<circle cx="208" cy="139" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="hyp_airframe">
+<circle cx="498" cy="172" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="hyp_thermal">
+<circle cx="373" cy="245" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="hyp_combustor">
+<circle cx="558" cy="286" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="hyp_turbine">
+<circle cx="741" cy="357" r="8" class="hotspotDot"/>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="hyp_hafnium_carbide" transform="translate(120,447)">
+<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="hyp_titanium_aluminide" transform="translate(265,447)">
+<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="hyp_silicon_carbide" transform="translate(410,447)">
+<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="hyp_rhenium_niobium" transform="translate(552,447)">
+<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="hyp_rhenium_nickel" transform="translate(695,447)">
+<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 4: SPACE PROBE
+         Photo: probe.png
+    ========================================================== -->
+<g class="craftLevel" data-level="probe">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderIcon" x="505" y="270">🔭</text>
+<text class="placeholderText" x="505" y="310">Add probe.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="probe.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="pb_structural">
+<circle cx="334" cy="303" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="pb_rtg">
+<circle cx="350" cy="95" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="pb_electronics">
+<circle cx="352" cy="218" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="pb_plating">
+<circle cx="707" cy="353" r="8" class="hotspotDot"/>
+</g>
+<g class="hotspot" data-target="pb_ion">
+<circle cx="633" cy="201" r="8" class="hotspotDot"/>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="pb_plutonium" transform="translate(118,456)">
+<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="pb_xenon" transform="translate(265,456)">
+<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="pb_tantalum" transform="translate(409.5,456)">
+<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="pb_beryllium" transform="translate(554,456)">
+<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
+<g class="badge" data-id="pb_gold" transform="translate(698,456)">
+<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+</g>
 </g>
 </g>
 
@@ -202,6 +332,15 @@
 <div id="factHead"></div>
 <div class="factCard" id="factCard"></div>
 <button class="btn" id="factContinueBtn">Continue →</button>
+</div>
+</div>
+
+<!-- LEVEL COMPLETE MODAL -->
+<div class="overlay" id="levelOverlay">
+<div class="modal">
+<h1>🎉 Level Complete!</h1>
+<p class="sub" id="levelCompleteText"></p>
+<button class="btn" id="nextLevelBtn">Next Level →</button>
 </div>
 </div>
 
@@ -221,3 +360,4 @@
 <script src="game.js"></script>
 </body>
 </html>
+
