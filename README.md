@@ -16,4 +16,4 @@ I started with the Space & Aviation domain as it is where the most astounding an
 
 ## What's next
 
-Expanding from space and aviation tech, I am keen on adding more domains viz: advanced computing & electronics, future transportation, mega renewable enrgy systems, extreme scientific machines and bioengineering.
+Expanding from space and aviation tech, I am keen on adding more domains viz: Advanced Computing & Electronics, Future Transportation, Mega Renewable Energy Systems, Extreme Scientific Machines and Bioengineering.
