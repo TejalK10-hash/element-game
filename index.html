@@ -8,6 +8,7 @@
 </head>
 <body>
 
+
 <header id="topbar">
 <div class="brand">🧬 Element Navigator</div>
 <div class="stats">
@@ -96,14 +97,6 @@
 <feMergeNode in="SourceGraphic"/>
 </feMerge>
 </filter>
-
-<!-- shared clip circle for every badge's material photo. It's
-     defined once at local origin (0,0) and reused by every badge
-     group — each badge's own translate() puts it in the right
-     spot on the board. -->
-<clipPath id="badgeClip">
-<circle cx="0" cy="0" r="34"/>
-</clipPath>
 </defs>
 
 <!-- decorative orbit ring -->
@@ -131,38 +124,53 @@
 
 <g class="hotspots">
 <g class="hotspot" data-target="r_heatshield">
-<circle cx="307" cy="101" r="8" class="hotspotDot"/>
+<circle cx="677" cy="101" r="8" class="hotspotDot"/>
+<text x="691" y="110" class="hotspotLabel">Heatshield / Nose Cone</text>
 </g>
 
 <g class="hotspot" data-target="r_airframe">
-<circle cx="491" cy="210" r="8" class="hotspotDot"/>
+<circle cx="575" cy="210" r="8" class="hotspotDot"/>
+<text x="505" y="210" class="hotspotLabel">Airframe</text>
 </g>
 <g class="hotspot" data-target="r_propellant">
-<circle cx="525" cy="280" r="8" class="hotspotDot"/>
+<circle cx="505" cy="280" r="8" class="hotspotDot"/>
+<text x="425" y="290" class="hotspotLabel">Propellant</text>
 </g>
 <g class="hotspot" data-target="r_cooling">
-<circle cx="587" cy="335" r="8" class="hotspotDot"/>
+<circle cx="455" cy="335" r="8" class="hotspotDot"/>
+<text x="335" y="335" class="hotspotLabel">Cooling System</text>
 </g>
 <g class="hotspot" data-target="r_nozzle">
-<circle cx="695" cy="392" r="8" class="hotspotDot"/>
+<circle cx="385" cy="392" r="8" class="hotspotDot"/>
+<text x="415" y="392" class="hotspotLabel">Nozzle</text>
 </g>
 </g>
 
 <g class="badges">
-<g class="badge" data-id="r_alli" transform="translate(228,482)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="r_alli" transform="translate(528,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Al-Li</text>
+<text y="52" class="badgeName">Aluminium-Lithium Alloy</text>
 </g>
-<g class="badge" data-id="r_niobium" transform="translate(595,482)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="r_niobium" transform="translate(895,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Nb</text>
+<text y="52" class="badgeName">Niobium</text>
 </g>
-<g class="badge" data-id="r_copper" transform="translate(475,482)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="r_copper" transform="translate(775,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Cu</text>
+<text y="52" class="badgeName">Copper</text>
 </g>
-<g class="badge" data-id="r_carbon" transform="translate(103,482)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="r_carbon" transform="translate(403,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">C</text>
+<text y="52" class="badgeName">Carbon</text>
 </g>
-<g class="badge" data-id="r_propellant" transform="translate(352,482)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="r_propellant" transform="translate(652,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">P</text>
+<text y="52" class="badgeName">Propellant</text>
 </g>
 </g>
 </g>
@@ -184,37 +192,52 @@
 
 <g class="hotspots">
 <g class="hotspot" data-target="s_nosecap">
-<circle cx="225" cy="105" r="8" class="hotspotDot"/>
+<circle cx="225" cy="305" r="8" class="hotspotDot"/>
+<text x="241" y="310" class="hotspotLabel">Nosecap & Wing Leading Edges</text>
 </g>
 <g class="hotspot" data-target="s_fuselage">
-<circle cx="395" cy="199" r="8" class="hotspotDot"/>
+<circle cx="495" cy="309" r="8" class="hotspotDot"/>
+<text x="511" y="309" class="hotspotLabel">Fuselage & Primary Structure</text>
 </g>
 <g class="hotspot" data-target="s_upperwing">
 <circle cx="756" cy="295" r="8" class="hotspotDot"/>
+<text x="772" y="299" class="hotspotLabel">Upper Surface Insulation</text>
 </g>
 <g class="hotspot" data-target="s_fittings">
 <circle cx="713" cy="385" r="8" class="hotspotDot"/>
+<text x="729" y="399" class="hotspotLabel">Hot Structural Fittings</text>
 </g>
 <g class="hotspot" data-target="s_belly">
-<circle cx="373" cy="320" r="8" class="hotspotDot"/>
+<circle cx="367" cy="395" r="8" class="hotspotDot"/>
+<text x="377" y="403" class="hotspotLabel">Underside Heatshield Tiles</text>
 </g>
 </g>
 
 <g class="badges">
-<g class="badge" data-id="s_rcc" transform="translate(100,475)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="s_rcc" transform="translate(100,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">RCC</text>
+<text y="52" class="badgeName">Reinforced Carbon-Carbon</text>
 </g>
-<g class="badge" data-id="s_silica" transform="translate(346,475)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="s_silica" transform="translate(346,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">SiO_2</text>
+<text y="52" class="badgeName">Silica</text>
 </g>
-<g class="badge" data-id="s_aluminum" transform="translate(223,475)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="s_aluminum" transform="translate(223,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Al</text>
+<text y="52" class="badgeName">Aluminum</text>
 </g>
-<g class="badge" data-id="s_inconel" transform="translate(469,475)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="s_inconel" transform="translate(469,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Ni-Cr</text>
+<text y="52" class="badgeName">Inconel</text>
 </g>
-<g class="badge" data-id="s_nomex" transform="translate(590,475)">
-<circle r="46" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="s_nomex" transform="translate(590,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Nmx</text>
+<text y="52" class="badgeName">Nomex</text>
 </g>
 </g>
 </g>
@@ -236,37 +259,52 @@
 
 <g class="hotspots">
 <g class="hotspot" data-target="hyp_leading_edge">
-<circle cx="208" cy="139" r="8" class="hotspotDot"/>
+<circle cx="808" cy="239" r="8" class="hotspotDot"/>
+<text x="824" y="239" class="hotspotLabel">Leading Edges</text>
 </g>
 <g class="hotspot" data-target="hyp_airframe">
-<circle cx="498" cy="172" r="8" class="hotspotDot"/>
+<circle cx="498" cy="272" r="8" class="hotspotDot"/>
+<text x="514" y="272" class="hotspotLabel">Airframe Skin</text>
 </g>
 <g class="hotspot" data-target="hyp_thermal">
-<circle cx="373" cy="245" r="8" class="hotspotDot"/>
+<circle cx="573" cy="325" r="8" class="hotspotDot"/>
+<text x="589" y="325" class="hotspotLabel">Thermal Protection Tiles</text>
 </g>
 <g class="hotspot" data-target="hyp_combustor">
-<circle cx="558" cy="286" r="8" class="hotspotDot"/>
+<circle cx="358" cy="375" r="8" class="hotspotDot"/>
+<text x="374" y="375" class="hotspotLabel">Combustor Walls</text>
 </g>
 <g class="hotspot" data-target="hyp_turbine">
-<circle cx="741" cy="357" r="8" class="hotspotDot"/>
+<circle cx="141" cy="375" r="8" class="hotspotDot"/>
+<text x="157" y="375" class="hotspotLabel">Engine Turbine Blades</text>
 </g>
 </g>
 
 <g class="badges">
-<g class="badge" data-id="hyp_hafnium_carbide" transform="translate(120,447)">
-<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="hyp_hafnium_carbide" transform="translate(120,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">HfC</text>
+<text y="52" class="badgeName">Hafnium Carbide</text>
 </g>
-<g class="badge" data-id="hyp_titanium_aluminide" transform="translate(265,447)">
-<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="hyp_titanium_aluminide" transform="translate(265,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">TiAl</text>
+<text y="52" class="badgeName">Titanium Aluminide</text>
 </g>
-<g class="badge" data-id="hyp_silicon_carbide" transform="translate(410,447)">
-<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="hyp_silicon_carbide" transform="translate(410,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">SiC</text>
+<text y="52" class="badgeName">Silicon Carbide</text>
 </g>
-<g class="badge" data-id="hyp_rhenium_niobium" transform="translate(552,447)">
-<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="hyp_rhenium_niobium" transform="translate(552,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">ReNb</text>
+<text y="52" class="badgeName">Rhenium Niobium</text>
 </g>
-<g class="badge" data-id="hyp_rhenium_nickel" transform="translate(695,447)">
-<circle r="54" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="hyp_rhenium_nickel" transform="translate(695,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">ReNi</text>
+<text y="52" class="badgeName">Rhenium Nickel</text>
 </g>
 </g>
 </g>
@@ -288,37 +326,52 @@
 
 <g class="hotspots">
 <g class="hotspot" data-target="pb_structural">
-<circle cx="334" cy="303" r="8" class="hotspotDot"/>
+<circle cx="342" cy="353" r="8" class="hotspotDot"/>
+<text x="360" y="357" class="hotspotLabel">Structural Components & Mirrors</text>
 </g>
 <g class="hotspot" data-target="pb_rtg">
-<circle cx="350" cy="95" r="8" class="hotspotDot"/>
+<circle cx="435" cy="242" r="8" class="hotspotDot"/>
+<text x="455" y="247" class="hotspotLabel">RTG</text>
 </g>
 <g class="hotspot" data-target="pb_electronics">
-<circle cx="352" cy="218" r="8" class="hotspotDot"/>
+<circle cx="307" cy="263" r="8" class="hotspotDot"/>
+<text x="325" y="267" class="hotspotLabel">Onboard Electronics (Capacitors)</text>
 </g>
 <g class="hotspot" data-target="pb_plating">
-<circle cx="707" cy="353" r="8" class="hotspotDot"/>
+<circle cx="690" cy="453" r="8" class="hotspotDot"/>
+<text x="708" y="457" class="hotspotLabel">Corrosion Resistant Plating</text>
 </g>
 <g class="hotspot" data-target="pb_ion">
-<circle cx="633" cy="201" r="8" class="hotspotDot"/>
+<circle cx="283" cy="151" r="8" class="hotspotDot"/>
+<text x="303" y="155" class="hotspotLabel">Ion Propulsion</text>
 </g>
 </g>
 
 <g class="badges">
-<g class="badge" data-id="pb_plutonium" transform="translate(118,456)">
-<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="pb_plutonium" transform="translate(118,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Pu</text>
+<text y="52" class="badgeName">Plutonium</text>
 </g>
-<g class="badge" data-id="pb_xenon" transform="translate(265,456)">
-<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="pb_xenon" transform="translate(265,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Xe</text>
+<text y="52" class="badgeName">Xenon</text>
 </g>
-<g class="badge" data-id="pb_tantalum" transform="translate(409.5,456)">
-<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="pb_tantalum" transform="translate(409.5,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Ta</text>
+<text y="52" class="badgeName">Tantalum</text>
 </g>
-<g class="badge" data-id="pb_beryllium" transform="translate(554,456)">
-<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="pb_beryllium" transform="translate(554,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Be</text>
+<text y="52" class="badgeName">Beryllium</text>
 </g>
-<g class="badge" data-id="pb_gold" transform="translate(698,456)">
-<circle r="58" class="badgeCircle" style="--c:#7dd3fc"/>
+<g class="badge" data-id="pb_gold" transform="translate(698,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Au</text>
+<text y="52" class="badgeName">Gold</text>
 </g>
 </g>
 </g>
