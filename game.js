@@ -1,25 +1,49 @@
 // ============================================================
-// GAME LOGIC — drag (or tap) an element badge onto the matching
-// hotspot on the spacecraft illustration.
+// GAME LOGIC — four levels (Rocket, Space Shuttle, Satellite,
+// Space Probe).
+// Drag (or tap) an element badge onto the matching hotspot on
+// the current level's spacecraft photo.
 // ============================================================
 
 const svg = document.getElementById("scene");
 const dragLine = document.getElementById("dragLine");
-const connectionsLayer = document.getElementById("connections");
 
 const els = {
   scoreVal: document.getElementById("scoreVal"),
   matchVal: document.getElementById("matchVal"),
   totalVal: document.getElementById("totalVal"),
+  levelsDoneVal: document.getElementById("levelsDoneVal"),
+  craftNameLabel: document.getElementById("craftNameLabel"),
   toast: document.getElementById("toast"),
 };
 
 const state = {
   score: 0,
-  matched: new Set(),
+  currentLevel: LEVELS[0].id,
+  matchedByLevel: Object.fromEntries(LEVELS.map((l) => [l.id, new Set()])),
   selectedId: null,
-  dragging: null, // { id, startX, startY }
+  dragging: null, // { id, pointerId, moved }
 };
+
+// ---------- lookups ----------
+function levelById(id) { return LEVELS.find((l) => l.id === id); }
+function currentLevel() { return levelById(state.currentLevel); }
+function elementById(id) {
+  for (const lvl of LEVELS) {
+    const found = lvl.elements.find((e) => e.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+function elementByHotspotInCurrentLevel(target) {
+  return currentLevel().elements.find((e) => e.hotspot === target);
+}
+function isLevelComplete(id) {
+  return state.matchedByLevel[id].size === levelById(id).elements.length;
+}
+function countLevelsDone() {
+  return LEVELS.filter((l) => isLevelComplete(l.id)).length;
+}
 
 // ---------- coordinate helpers ----------
 function svgPoint(clientX, clientY) {
@@ -40,13 +64,13 @@ function hotspotCenter(target) {
   return { x: parseFloat(dot.getAttribute("cx")), y: parseFloat(dot.getAttribute("cy")) };
 }
 
-function elementById(id) { return ELEMENTS.find((e) => e.id === id); }
-function elementByHotspot(target) { return ELEMENTS.find((e) => e.hotspot === target); }
+function activeConnectionsLayer() {
+  return svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .connections`);
+}
 
 // ---------- init ----------
 function init() {
-  els.totalVal.textContent = ELEMENTS.length;
-  updateHud();
+  buildStars();
 
   svg.querySelectorAll(".badge").forEach((badge) => {
     badge.addEventListener("pointerdown", onBadgePointerDown);
@@ -55,13 +79,93 @@ function init() {
   svg.querySelectorAll(".hotspot").forEach((hotspot) => {
     hotspot.addEventListener("click", onHotspotClick);
   });
+  document.querySelectorAll(".levelTab").forEach((tab) => {
+    tab.addEventListener("click", () => switchLevel(tab.dataset.level));
+  });
+
+  const levelsTotalEl = document.getElementById("levelsTotalVal");
+  if (levelsTotalEl) levelsTotalEl.textContent = LEVELS.length;
+
+  preloadCraftPhotos();
+  preloadBadgePhotos();
+  switchLevel(state.currentLevel);
 }
 
-// ---------- tap-to-select / tap-to-match (also fires after a non-drag click) ----------
+// every level defines a `photo` filename and gets a placeholder
+// frame; swap the real photo in only if the file actually loads,
+// otherwise keep the dashed "add a photo here" frame visible.
+function preloadCraftPhotos() {
+  LEVELS.filter((l) => l.photo).forEach((l) => {
+    const group = svg.querySelector(`.craftLevel[data-level="${l.id}"] .craftArt`);
+    const img = new Image();
+    img.onload = () => group.classList.add("hasPhoto");
+    img.onerror = () => group.classList.remove("hasPhoto");
+    img.src = l.photo;
+  });
+  svg.querySelectorAll(".craftArt image.craftPhoto").forEach((img) => {
+    img.addEventListener("load", () => img.setAttribute("opacity", "1"));
+  });
+}
+
+// each element badge can define an `image` filename (e.g. a photo
+// or texture of the actual material). Same graceful fallback as
+// the craft photos: try loading it, and only swap it in — hiding
+// the symbol text — if it actually loads.
+function preloadBadgePhotos() {
+  LEVELS.forEach((lvl) => {
+    lvl.elements.filter((e) => e.image).forEach((e) => {
+      const badge = svg.querySelector(`.badge[data-id="${e.id}"]`);
+      if (!badge) return;
+      const img = new Image();
+      img.onload = () => badge.classList.add("hasPhoto");
+      img.onerror = () => badge.classList.remove("hasPhoto");
+      img.src = e.image;
+    });
+  });
+  svg.querySelectorAll(".badge image.badgePhoto").forEach((img) => {
+    img.addEventListener("load", () => img.setAttribute("opacity", "1"));
+  });
+}
+
+function buildStars() {
+  const wrap = document.getElementById("stars");
+  const n = 60;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const size = Math.random() * 2 + 1;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDelay = Math.random() * 3 + "s";
+    wrap.appendChild(s);
+  }
+}
+
+// ---------- level switching ----------
+function switchLevel(id) {
+  state.currentLevel = id;
+  state.selectedId = null;
+  state.dragging = null;
+
+  svg.querySelectorAll(".craftLevel").forEach((g) => {
+    g.classList.toggle("activeLevel", g.dataset.level === id);
+  });
+  document.querySelectorAll(".levelTab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.level === id);
+  });
+
+  els.craftNameLabel.textContent = levelById(id).craftName;
+  refreshSelection();
+  updateHud();
+}
+
+// ---------- tap-to-select / tap-to-match ----------
 function onBadgeClick(e) {
-  if (state.dragging) return; // drag handled separately
+  if (state.dragging) return;
   const id = e.currentTarget.dataset.id;
-  if (state.matched.has(id)) return;
+  if (state.matchedByLevel[state.currentLevel].has(id)) return;
   state.selectedId = state.selectedId === id ? null : id;
   refreshSelection();
 }
@@ -85,7 +189,7 @@ function refreshSelection() {
 function onBadgePointerDown(e) {
   const badge = e.currentTarget;
   const id = badge.dataset.id;
-  if (state.matched.has(id)) return;
+  if (state.matchedByLevel[state.currentLevel].has(id)) return;
 
   badge.setPointerCapture(e.pointerId);
   const center = badgeCenter(id);
@@ -123,17 +227,17 @@ function onBadgePointerUp(e) {
   state.dragging = null;
   if (!moved) return; // treat as a click, handled by onBadgeClick
 
-  // find hotspot under release point
   const p = svgPoint(e.clientX, e.clientY);
   let closestTarget = null;
   let closestDist = Infinity;
-  svg.querySelectorAll(".hotspot").forEach((h) => {
+  svg.querySelectorAll(`.craftLevel[data-level="${state.currentLevel}"] .hotspot`).forEach((h) => {
     const c = hotspotCenter(h.dataset.target);
     const d = Math.hypot(c.x - p.x, c.y - p.y);
     if (d < closestDist) { closestDist = d; closestTarget = h.dataset.target; }
   });
 
-  if (closestTarget && closestDist < 45 && !state.matched.has(elementByHotspot(closestTarget)?.id)) {
+  const targetEl = closestTarget ? elementByHotspotInCurrentLevel(closestTarget) : null;
+  if (closestTarget && closestDist < 45 && !(targetEl && state.matchedByLevel[state.currentLevel].has(targetEl.id))) {
     attemptMatch(id, closestTarget);
   }
 }
@@ -141,10 +245,10 @@ function onBadgePointerUp(e) {
 // ---------- matching ----------
 function attemptMatch(elementId, target) {
   const el = elementById(elementId);
-  const hotspotEl = svg.querySelector(`.hotspot[data-target="${target}"]`);
+  const hotspotEl = svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .hotspot[data-target="${target}"]`);
 
   if (el.hotspot === target) {
-    state.matched.add(el.id);
+    state.matchedByLevel[state.currentLevel].add(el.id);
     state.score += 20;
     state.selectedId = null;
     updateHud();
@@ -164,7 +268,7 @@ function attemptMatch(elementId, target) {
 
     hotspotEl.classList.add("wrong");
     setTimeout(() => hotspotEl.classList.remove("wrong"), 300);
-    const correctEl = elementByHotspot(target);
+    const correctEl = elementByHotspotInCurrentLevel(target);
     showToast(`🚫 Not quite -- that hotspot is for ${correctEl.name} (${correctEl.use}).`, false);
   }
 }
@@ -178,16 +282,20 @@ function drawPermanentConnection(elementId, target) {
   path.setAttribute("d", `M ${a.x} ${a.y} Q ${midX} ${midY} ${b.x} ${b.y}`);
   path.setAttribute("class", "connectionLine");
   path.style.stroke = elementById(elementId).color;
-  connectionsLayer.appendChild(path);
+  activeConnectionsLayer().appendChild(path);
 }
 
 // ---------- HUD / toast ----------
 function updateHud() {
+  const lvl = currentLevel();
   els.scoreVal.textContent = state.score;
-  els.matchVal.textContent = state.matched.size;
-  if (state.matched.size === ELEMENTS.length) {
-    setTimeout(showWin, 500);
-  }
+  els.matchVal.textContent = state.matchedByLevel[state.currentLevel].size;
+  els.totalVal.textContent = lvl.elements.length;
+  els.levelsDoneVal.textContent = countLevelsDone();
+
+  document.querySelectorAll(".levelTab").forEach((tab) => {
+    tab.classList.toggle("complete", isLevelComplete(tab.dataset.level));
+  });
 }
 
 function showToast(msg, good) {
@@ -197,7 +305,7 @@ function showToast(msg, good) {
   showToast._t = setTimeout(() => { els.toast.className = ""; }, 2200);
 }
 
-// ---------- modals ----------
+// ---------- fact modal ----------
 function showFact(el) {
   document.getElementById("factHead").innerHTML =
     `<h1>✅ Connection Made!</h1><p class="sub">${el.name} wired to ${el.use}.</p>`;
@@ -210,34 +318,63 @@ function showFact(el) {
 }
 document.getElementById("factContinueBtn").addEventListener("click", () => {
   document.getElementById("factOverlay").classList.remove("show");
+  checkLevelCompletionAfterFact();
+});
+
+// ---------- level-complete / win flow ----------
+function checkLevelCompletionAfterFact() {
+  if (!isLevelComplete(state.currentLevel)) return;
+  if (countLevelsDone() === LEVELS.length) {
+    showWin();
+  } else {
+    showLevelComplete(currentLevel());
+  }
+}
+
+function showLevelComplete(lvl) {
+  document.getElementById("levelCompleteText").textContent =
+    `You've wired up every material on the ${lvl.label}. Ready for the next challenge?`;
+  document.getElementById("levelOverlay").classList.add("show");
+}
+document.getElementById("nextLevelBtn").addEventListener("click", () => {
+  document.getElementById("levelOverlay").classList.remove("show");
+  const next = LEVELS.find((l) => !isLevelComplete(l.id));
+  if (next) switchLevel(next.id);
 });
 
 function showWin() {
   document.getElementById("finalScore").textContent = state.score;
   const glossary = document.getElementById("winGlossary");
   glossary.innerHTML = "";
-  ELEMENTS.forEach((el) => {
-    const item = document.createElement("div");
-    item.className = "glItem";
-    item.innerHTML = `<div class="h">${el.symbol} ${el.name} — ${el.use}</div><div class="b">${el.fact}</div>`;
-    glossary.appendChild(item);
+  LEVELS.forEach((lvl) => {
+    lvl.elements.forEach((el) => {
+      const item = document.createElement("div");
+      item.className = "glItem";
+      item.innerHTML = `<div class="h">${lvl.icon} ${el.symbol} ${el.name} — ${el.use}</div><div class="b">${el.fact}</div>`;
+      glossary.appendChild(item);
+    });
   });
   document.getElementById("winOverlay").classList.add("show");
 }
 document.getElementById("playAgainBtn").addEventListener("click", resetGame);
 document.getElementById("resetBtn").addEventListener("click", resetGame);
 
+// ---------- reset ----------
 function resetGame() {
   state.score = 0;
-  state.matched = new Set();
+  state.matchedByLevel = Object.fromEntries(LEVELS.map((l) => [l.id, new Set()]));
   state.selectedId = null;
   state.dragging = null;
-  connectionsLayer.innerHTML = "";
+
+  svg.querySelectorAll(".connections").forEach((g) => { g.innerHTML = ""; });
   svg.querySelectorAll(".badge").forEach((b) => b.classList.remove("matched", "selected"));
   svg.querySelectorAll(".hotspot").forEach((h) => h.classList.remove("matched", "wrong"));
+
   document.getElementById("winOverlay").classList.remove("show");
   document.getElementById("factOverlay").classList.remove("show");
-  updateHud();
+  document.getElementById("levelOverlay").classList.remove("show");
+
+  switchLevel(LEVELS[0].id);
 }
 
 init();
