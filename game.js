@@ -248,29 +248,25 @@ function attemptMatch(elementId, target) {
   const hotspotEl = svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .hotspot[data-target="${target}"]`);
 
   if (el.hotspot === target) {
-    state.matchedByLevel[state.currentLevel].add(el.id);
-    state.score += 20;
-    state.selectedId = null;
-    updateHud();
-    refreshSelection();
+  state.matchedByLevel[state.currentLevel].add(el.id);
+  state.score += 20;
+  state.selectedId = null;
+  updateHud();
+  refreshSelection();
 
-    svg.querySelector(`.badge[data-id="${el.id}"]`).classList.add("matched");
-    hotspotEl.classList.add("matched");
-    drawPermanentConnection(el.id, target);
+  svg.querySelector(`.badge[data-id="${el.id}"]`).classList.add("matched");
+  hotspotEl.classList.add("matched");
+  drawPermanentConnection(el.id, target);
 
-    showFact(el);
-    showToast(`✅ ${el.name} correctly wired to ${el.use}!`, true);
+  showFact(el);
+
+  // 1-in-5 chance to show a surprise fact instead of the normal toast
+  if (el.surpriseFact && Math.random() < 0.2) {
+    showSurpriseFact(el);
   } else {
-    state.score = Math.max(0, state.score - 5);
-    updateHud();
-    state.selectedId = null;
-    refreshSelection();
-
-    hotspotEl.classList.add("wrong");
-    setTimeout(() => hotspotEl.classList.remove("wrong"), 300);
-    const correctEl = elementByHotspotInCurrentLevel(target);
-    showToast(`🚫 Not quite -- that hotspot is for ${correctEl.name} (${correctEl.use}).`, false);
+    showToast(`${el.name} correctly wired to ${el.use}!`, true);
   }
+}
 }
 
 function drawPermanentConnection(elementId, target) {
@@ -303,6 +299,13 @@ function showToast(msg, good) {
   els.toast.className = "show" + (good ? " good" : "");
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => { els.toast.className = ""; }, 2200);
+}
+
+function showSurpriseFact(el) {
+  els.toast.innerHTML = `✨ <b>Did you know?</b> ${el.surpriseFact}`;
+  els.toast.className = "show good surprise";
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { els.toast.className = ""; }, 4500);
 }
 
 // ---------- fact modal ----------
