@@ -193,17 +193,6 @@ body {
 /* ---------------- hotspots ---------------- */
 .hotspot { cursor: pointer; }
 
-.hotspotRing {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.5;
-  opacity: 0.85;
-  animation: pulseRing 2.2s ease-in-out infinite;
-}
-@keyframes pulseRing {
-  0%, 100% { r: 14; opacity: 0.85; }
-  50% { r: 18; opacity: 0.35; }
-}
 
 .hotspotDot { fill: var(--accent); }
 
@@ -216,11 +205,9 @@ body {
   stroke-width: 4px;
 }
 
-.hotspot.matched .hotspotRing { stroke: var(--good); animation: none; r: 14; opacity: 0.5; }
 .hotspot.matched .hotspotDot { fill: var(--good); }
 .hotspot.matched .hotspotLabel { fill: var(--good); }
 
-.hotspot.wrong .hotspotRing { stroke: var(--bad); }
 .hotspot.wrong .hotspotDot { fill: var(--bad); }
 
 /* ---------------- connections / drag line ---------------- */
