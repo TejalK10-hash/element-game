@@ -3,19 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Element Navigator: Connect the Tech</title>
+<title> Element Navigator: Connect the Tech</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 
 <header id="topbar">
-<div class="brand">From Elements to Engineering Marvels</div>
+<div class="brand" preserveAspectRatio="xMidYTop meet">FROM ELEMENTS TO ENGINEERING MARVELS</div>
 <div class="stats">
-<span>Score: <b id="scoreVal">0</b></span>
-<span>Matched: <b id="matchVal">0</b>/<span id="totalVal">0</span></span>
-<span class="levelsDone">Levels: <b id="levelsDoneVal">0</b>/<span id="levelsTotalVal">4</span></span>
-</div>
+
 <button id="resetBtn">Reset</button>
 </header>
 
@@ -26,11 +23,16 @@
 <button class="levelTab" data-level="probe">Space Probe</button>
 </nav>
 
+<span id="scoreboard">
+<span>Score: <b id="scoreVal">0</b></span>
+<span>Matched: <b id="matchVal">0</b>/<span id="totalVal">0</span></span>
+<span class="levelsDone">Levels: <b id="levelsDoneVal">0</b>/<span id="levelsTotalVal">4</span></span>
+</span>
+
 <p id="instructions">
     <b>HOW TO PLAY:</b> Drag a line from each <b>element</b> to the part of the <span id="craftNameLabel">spacecraft</span> that uses it or tap an element, then tap the matching part.
 </p>
 
-<main id="board">
 <div id="stars"></div>
 
 <svg id="scene" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" touch-action="none">
