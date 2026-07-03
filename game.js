@@ -15,6 +15,7 @@ const els = {
   levelsDoneVal: document.getElementById("levelsDoneVal"),
   craftNameLabel: document.getElementById("craftNameLabel"),
   toast: document.getElementById("toast"),
+  streakVal: null, // filled in by initStreakDisplay()
 };
 
 const state = {
@@ -23,6 +24,9 @@ const state = {
   matchedByLevel: Object.fromEntries(LEVELS.map((l) => [l.id, new Set()])),
   selectedId: null,
   dragging: null, // { id, pointerId, moved }
+  streak: 0,
+  bestStreak: 0,
+  mistakesByLevel: Object.fromEntries(LEVELS.map((l) => [l.id, 0])),
 };
 
 // ---------- lookups ----------
@@ -43,6 +47,15 @@ function isLevelComplete(id) {
 }
 function countLevelsDone() {
   return LEVELS.filter((l) => isLevelComplete(l.id)).length;
+}
+function starsForLevel(id) {
+  const m = state.mistakesByLevel[id];
+  if (m === 0) return 3;
+  if (m <= 2) return 2;
+  return 1;
+}
+function starString(n) {
+  return "⭐".repeat(n) + "☆".repeat(3 - n);
 }
 
 // ---------- coordinate helpers ----------
@@ -71,6 +84,7 @@ function activeConnectionsLayer() {
 // ---------- init ----------
 function init() {
   buildStars();
+  initStreakDisplay();
 
   svg.querySelectorAll(".badge").forEach((badge) => {
     badge.addEventListener("pointerdown", onBadgePointerDown);
@@ -89,6 +103,18 @@ function init() {
   preloadCraftPhotos();
   preloadBadgePhotos();
   switchLevel(state.currentLevel);
+}
+
+// adds a "Streak: N" stat into the existing .stats bar without
+// requiring any changes to index.html
+function initStreakDisplay() {
+  const statsBar = document.querySelector(".stats");
+  if (!statsBar) return;
+  const span = document.createElement("span");
+  span.className = "streakStat";
+  span.innerHTML = `Streak: <b id="streakVal">0</b>`;
+  statsBar.appendChild(span);
+  els.streakVal = document.getElementById("streakVal");
 }
 
 // every level defines a `photo` filename and gets a placeholder
@@ -248,25 +274,43 @@ function attemptMatch(elementId, target) {
   const hotspotEl = svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .hotspot[data-target="${target}"]`);
 
   if (el.hotspot === target) {
-  state.matchedByLevel[state.currentLevel].add(el.id);
-  state.score += 20;
-  state.selectedId = null;
-  updateHud();
-  refreshSelection();
+    state.matchedByLevel[state.currentLevel].add(el.id);
 
-  svg.querySelector(`.badge[data-id="${el.id}"]`).classList.add("matched");
-  hotspotEl.classList.add("matched");
-  drawPermanentConnection(el.id, target);
+    state.streak += 1;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    const streakBonus = state.streak >= 2 ? (state.streak - 1) * 5 : 0;
+    state.score += 20 + streakBonus;
 
-  showFact(el);
+    state.selectedId = null;
+    updateHud();
+    refreshSelection();
 
-  // 1-in-5 chance to show a surprise fact instead of the normal toast
-  if (el.surpriseFact && Math.random() < 0.2) {
-    showSurpriseFact(el);
+    svg.querySelector(`.badge[data-id="${el.id}"]`).classList.add("matched");
+    hotspotEl.classList.add("matched");
+    drawPermanentConnection(el.id, target);
+
+    showFact(el);
+
+    if (el.surpriseFact && Math.random() < 0.2) {
+      showSurpriseFact(el);
+    } else if (state.streak >= 3) {
+      showToast(`🔥 ${state.streak} in a row! +${streakBonus} bonus`, true);
+    } else {
+      showToast(`✅ ${el.name} correctly wired to ${el.use}!`, true);
+    }
   } else {
-    showToast(`${el.name} correctly wired to ${el.use}!`, true);
+    state.score = Math.max(0, state.score - 5);
+    state.streak = 0;
+    state.mistakesByLevel[state.currentLevel] += 1;
+    updateHud();
+    state.selectedId = null;
+    refreshSelection();
+
+    hotspotEl.classList.add("wrong");
+    setTimeout(() => hotspotEl.classList.remove("wrong"), 300);
+    const correctEl = elementByHotspotInCurrentLevel(target);
+    showToast(`🚫 Not quite -- that hotspot is for ${correctEl.name} (${correctEl.use}).`, false);
   }
-}
 }
 
 function drawPermanentConnection(elementId, target) {
@@ -288,6 +332,7 @@ function updateHud() {
   els.matchVal.textContent = state.matchedByLevel[state.currentLevel].size;
   els.totalVal.textContent = lvl.elements.length;
   els.levelsDoneVal.textContent = countLevelsDone();
+  if (els.streakVal) els.streakVal.textContent = state.streak;
 
   document.querySelectorAll(".levelTab").forEach((tab) => {
     tab.classList.toggle("complete", isLevelComplete(tab.dataset.level));
@@ -335,8 +380,9 @@ function checkLevelCompletionAfterFact() {
 }
 
 function showLevelComplete(lvl) {
-  document.getElementById("levelCompleteText").textContent =
-    `You've wired up every material on the ${lvl.label}. Ready for the next challenge?`;
+  const stars = starsForLevel(lvl.id);
+  document.getElementById("levelCompleteText").innerHTML =
+    `You've wired up every material on the ${lvl.label}.<br><span style="font-size:1.4rem">${starString(stars)}</span><br>Ready for the next challenge?` + "\n" + `You've got this!!!`;
   document.getElementById("levelOverlay").classList.add("show");
 }
 document.getElementById("nextLevelBtn").addEventListener("click", () => {
@@ -348,7 +394,10 @@ document.getElementById("nextLevelBtn").addEventListener("click", () => {
 function showWin() {
   document.getElementById("finalScore").textContent = state.score;
   const glossary = document.getElementById("winGlossary");
-  glossary.innerHTML = "";
+  glossary.innerHTML = `<div style="text-align:center;margin-bottom:10px">
+    Best streak: 🔥${state.bestStreak} &nbsp;|&nbsp;
+    ${LEVELS.map(l => `${l.icon} ${starString(starsForLevel(l.id))}`).join("  ")}
+  </div>`;
   LEVELS.forEach((lvl) => {
     lvl.elements.forEach((el) => {
       const item = document.createElement("div");
@@ -368,6 +417,9 @@ function resetGame() {
   state.matchedByLevel = Object.fromEntries(LEVELS.map((l) => [l.id, new Set()]));
   state.selectedId = null;
   state.dragging = null;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.mistakesByLevel = Object.fromEntries(LEVELS.map((l) => [l.id, 0]));
 
   svg.querySelectorAll(".connections").forEach((g) => { g.innerHTML = ""; });
   svg.querySelectorAll(".badge").forEach((b) => b.classList.remove("matched", "selected"));
