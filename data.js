@@ -1,15 +1,5 @@
 // ============================================================
 // LEVEL + ELEMENT DATA
-// Five levels, each modeling a different spacecraft. Every
-// element pairs with a `hotspot` id that must match a
-// data-target on a .hotspot group inside that level's craft
-// group in index.html.
-//
-// Every level now uses a full-bleed background photo (same
-// treatment as the rocket). Drop a photo with the matching
-// filename into this project folder and it swaps in
-// automatically; until then a dashed placeholder frame shows
-// where to put it.
 // ============================================================
 
 const LEVELS = [
