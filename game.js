@@ -1,165 +1,194 @@
-// ============================================================
-// GAME LOGIC — four levels (Rocket, Space Shuttle, Satellite,
-// Space Probe).
-// Drag (or tap) an element badge onto the matching hotspot on
-// the current level's spacecraft photo.
-// ============================================================
+// game logic - started dec 2024, last touched jan 2025
+// TODO: clean up the streak logic, it's buggy on mobile
+
+var DEBUG = true;
 
 const svg = document.getElementById("scene");
 const dragLine = document.getElementById("dragLine");
 
-const els = {
-  scoreVal: document.getElementById("scoreVal"),
-  matchVal: document.getElementById("matchVal"),
-  totalVal: document.getElementById("totalVal"),
-  levelsDoneVal: document.getElementById("levelsDoneVal"),
-  craftNameLabel: document.getElementById("craftNameLabel"),
-  toast: document.getElementById("toast"),
-  streakVal: null, // filled in by initStreakDisplay()
-};
+// keeping score
+var score = 0; // global for quick access
 
-const state = {
+function checkMatch(element, hotspot) {
+    if (element == hotspot) { // == is fine here
+        score += 10;
+    } else {
+        score -= 5;
+    }
+}
+
+// ui refs
+var ui = {};
+ui.scoreVal = document.getElementById("scoreVal");
+ui.matchVal = document.getElementById("matchVal");
+ui.totalVal = document.getElementById("totalVal");
+ui.levelsDoneVal = document.getElementById("levelsDoneVal");
+ui.craftNameLabel = document.getElementById("craftNameLabel");
+ui.toast = document.getElementById("toast");
+ui.streakVal = null;
+
+var st = {
   score: 0,
   currentLevel: LEVELS[0].id,
-  matchedByLevel: Object.fromEntries(LEVELS.map((l) => [l.id, new Set()])),
+  matchedByLevel: {},
   selectedId: null,
-  dragging: null, // { id, pointerId, moved }
+  dragging: null,
   streak: 0,
   bestStreak: 0,
-  mistakesByLevel: Object.fromEntries(LEVELS.map((l) => [l.id, 0])),
+  mistakesByLevel: {}
 };
 
-// ---------- lookups ----------
-function levelById(id) { return LEVELS.find((l) => l.id === id); }
-function currentLevel() { return levelById(state.currentLevel); }
-function elementById(id) {
-  for (const lvl of LEVELS) {
-    const found = lvl.elements.find((e) => e.id === id);
+// init lookup tables
+for (var i=0; i<LEVELS.length; i++) {
+  st.matchedByLevel[LEVELS[i].id] = new Set();
+  st.mistakesByLevel[LEVELS[i].id] = 0;
+}
+
+function levelById(id) { 
+  for (var i=0; i<LEVELS.length; i++) {
+    if (LEVELS[i].id === id) return LEVELS[i];
+  }
+  return null;
+}
+
+function curLvl() { return levelById(st.currentLevel); }
+
+function elById(id) {
+  for (var i=0; i<LEVELS.length; i++) {
+    var found = LEVELS[i].elements.find(function(e){ return e.id == id; });
     if (found) return found;
   }
   return null;
 }
-function elementByHotspotInCurrentLevel(target) {
-  return currentLevel().elements.find((e) => e.hotspot === target);
+
+function hotspotEl(target) {
+  return curLvl().elements.find(function(e){ return e.hotspot == target; });
 }
-function isLevelComplete(id) {
-  return state.matchedByLevel[id].size === levelById(id).elements.length;
+
+function lvlComplete(id) {
+  return st.matchedByLevel[id].size === levelById(id).elements.length;
 }
-function countLevelsDone() {
-  return LEVELS.filter((l) => isLevelComplete(l.id)).length;
+
+function countDone() {
+  var n = 0;
+  for (var i=0; i<LEVELS.length; i++) {
+    if (lvlComplete(LEVELS[i].id)) n++;
+  }
+  return n;
 }
-function starsForLevel(id) {
-  const m = state.mistakesByLevel[id];
-  if (m === 0) return 3;
+
+function starsFor(id) {
+  var m = st.mistakesByLevel[id];
+  if (m == 0) return 3;
   if (m <= 2) return 2;
   return 1;
 }
-function starString(n) {
-  return "⭐".repeat(n) + "☆".repeat(3 - n);
+
+function starStr(n) {
+  var out = "";
+  for (var i=0; i<n; i++) out += "⭐";
+  for (var i=0; i<3-n; i++) out += "☆";
+  return out;
 }
 
-// ---------- coordinate helpers ----------
+// helper for svg coords
 function svgPoint(clientX, clientY) {
-  const pt = svg.createSVGPoint();
+  var pt = svg.createSVGPoint();
   pt.x = clientX;
   pt.y = clientY;
   return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
 function badgeCenter(id) {
-  const g = svg.querySelector(`.badge[data-id="${id}"]`);
-  const match = /translate\(([-\d.]+)[,\s]+([-\d.]+)\)/.exec(g.getAttribute("transform"));
-  return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+  var g = svg.querySelector('.badge[data-id = "' + id + '"]');
+  var m = /translate\(([-\d.]+)[, \s]+([-\d.]+)\)/.exec(g.getAttribute("transform"));
+  return { x: parseFloat(m[1]), y: parseFloat(m[2]) };
 }
 
 function hotspotCenter(target) {
-  const dot = svg.querySelector(`.hotspot[data-target="${target}"] .hotspotDot`);
+  var dot = svg.querySelector('.hotspot[data-target = "' + target + '"] .hotspotDot');
   return { x: parseFloat(dot.getAttribute("cx")), y: parseFloat(dot.getAttribute("cy")) };
 }
 
-function activeConnectionsLayer() {
-  return svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .connections`);
+function connLayer() {
+  return svg.querySelector('.craftLevel[data-level = "' + st.currentLevel + '"] .connections');
 }
 
-// ---------- init ----------
 function init() {
   buildStars();
-  initStreakDisplay();
+  initStreak();
+  
+  if (DEBUG) console.log("game init, levels:", LEVELS.length);
 
-  svg.querySelectorAll(".badge").forEach((badge) => {
-    badge.addEventListener("pointerdown", onBadgePointerDown);
+  svg.querySelectorAll(".badge").forEach(function(badge){
+    badge.addEventListener("pointerdown", onBadgeDown);
     badge.addEventListener("click", onBadgeClick);
   });
-  svg.querySelectorAll(".hotspot").forEach((hotspot) => {
+  
+  svg.querySelectorAll(".hotspot").forEach(function(hotspot){
     hotspot.addEventListener("click", onHotspotClick);
   });
-  document.querySelectorAll(".levelTab").forEach((tab) => {
-    tab.addEventListener("click", () => switchLevel(tab.dataset.level));
+  
+  document.querySelectorAll(".levelTab").forEach(function(tab){
+    tab.addEventListener("click", function(){ switchLevel(tab.dataset.level); });
   });
 
-  const levelsTotalEl = document.getElementById("levelsTotalVal");
+  var levelsTotalEl = document.getElementById("levelsTotalVal");
   if (levelsTotalEl) levelsTotalEl.textContent = LEVELS.length;
 
   preloadCraftPhotos();
   preloadBadgePhotos();
-  switchLevel(state.currentLevel);
+  switchLevel(st.currentLevel);
 }
 
-// adds a "Streak: N" stat into the existing .stats bar without
-// requiring any changes to index.html
-function initStreakDisplay() {
-  const statsBar = document.querySelector(".stats");
+function initStreak() {
+  var statsBar = document.querySelector(".stats");
   if (!statsBar) return;
-  const span = document.createElement("span");
+  var span = document.createElement("span");
   span.className = "streakStat";
-  span.innerHTML = `Streak: <b id="streakVal">0</b>`;
+  span.innerHTML = 'Streak: <b id="streakVal">0</b>';
   statsBar.appendChild(span);
-  els.streakVal = document.getElementById("streakVal");
+  ui.streakVal = document.getElementById("streakVal");
 }
 
-// every level defines a `photo` filename and gets a placeholder
-// frame; swap the real photo in only if the file actually loads,
-// otherwise keep the dashed "add a photo here" frame visible.
 function preloadCraftPhotos() {
-  LEVELS.filter((l) => l.photo).forEach((l) => {
-    const group = svg.querySelector(`.craftLevel[data-level="${l.id}"] .craftArt`);
-    const img = new Image();
-    img.onload = () => group.classList.add("hasPhoto");
-    img.onerror = () => group.classList.remove("hasPhoto");
+  LEVELS.filter(function(l){ return l.photo; }).forEach(function(l){
+    var group = svg.querySelector('.craftLevel[data-level = "' + l.id + '"] .craftArt');
+    var img = new Image();
+    img.onload = function(){ group.classList.add("hasPhoto"); };
+    img.onerror = function(){ group.classList.remove("hasPhoto"); };
     img.src = l.photo;
   });
-  svg.querySelectorAll(".craftArt image.craftPhoto").forEach((img) => {
-    img.addEventListener("load", () => img.setAttribute("opacity", "1"));
+  
+  svg.querySelectorAll(".craftArt image.craftPhoto").forEach(function(img){
+    img.addEventListener("load", function(){ img.setAttribute("opacity", "1"); });
   });
 }
 
-// each element badge can define an `image` filename (e.g. a photo
-// or texture of the actual material). Same graceful fallback as
-// the craft photos: try loading it, and only swap it in — hiding
-// the symbol text — if it actually loads.
 function preloadBadgePhotos() {
-  LEVELS.forEach((lvl) => {
-    lvl.elements.filter((e) => e.image).forEach((e) => {
-      const badge = svg.querySelector(`.badge[data-id="${e.id}"]`);
+  LEVELS.forEach(function(lvl){
+    lvl.elements.filter(function(e){ return e.image; }).forEach(function(e){
+      var badge = svg.querySelector('.badge[data-id = "' + e.id + '"]');
       if (!badge) return;
-      const img = new Image();
-      img.onload = () => badge.classList.add("hasPhoto");
-      img.onerror = () => badge.classList.remove("hasPhoto");
+      var img = new Image();
+      img.onload = function(){ badge.classList.add("hasPhoto"); };
+      img.onerror = function(){ badge.classList.remove("hasPhoto"); };
       img.src = e.image;
     });
   });
-  svg.querySelectorAll(".badge image.badgePhoto").forEach((img) => {
-    img.addEventListener("load", () => img.setAttribute("opacity", "1"));
+  
+  svg.querySelectorAll(".badge image.badgePhoto").forEach(function(img){
+    img.addEventListener("load", function(){ img.setAttribute("opacity", "1"); });
   });
 }
 
 function buildStars() {
-  const wrap = document.getElementById("stars");
-  const n = 60;
-  for (let i = 0; i < n; i++) {
-    const s = document.createElement("div");
+  var wrap = document.getElementById("stars");
+  var n = 60;
+  for (var i = 0; i < n; i++) {
+    var s = document.createElement("div");
     s.className = "star";
-    const size = Math.random() * 2 + 1;
+    var size = Math.random() * 2 + 1;
     s.style.width = size + "px";
     s.style.height = size + "px";
     s.style.left = Math.random() * 100 + "%";
@@ -169,261 +198,270 @@ function buildStars() {
   }
 }
 
-// ---------- level switching ----------
 function switchLevel(id) {
-  state.currentLevel = id;
-  state.selectedId = null;
-  state.dragging = null;
+  st.currentLevel = id;
+  st.selectedId = null;
+  st.dragging = null;
 
-  svg.querySelectorAll(".craftLevel").forEach((g) => {
+  svg.querySelectorAll(".craftLevel").forEach(function(g){
     g.classList.toggle("activeLevel", g.dataset.level === id);
   });
-  document.querySelectorAll(".levelTab").forEach((tab) => {
+  
+  document.querySelectorAll(".levelTab").forEach(function(tab){
     tab.classList.toggle("active", tab.dataset.level === id);
   });
 
-  els.craftNameLabel.textContent = levelById(id).craftName;
-  refreshSelection();
+  ui.craftNameLabel.textContent = levelById(id).craftName;
+  refreshSel();
   updateHud();
 }
 
-// ---------- tap-to-select / tap-to-match ----------
 function onBadgeClick(e) {
-  if (state.dragging) return;
-  const id = e.currentTarget.dataset.id;
-  if (state.matchedByLevel[state.currentLevel].has(id)) return;
-  state.selectedId = state.selectedId === id ? null : id;
-  refreshSelection();
+  if (st.dragging) return;
+  var id = e.currentTarget.dataset.id;
+  if (st.matchedByLevel[st.currentLevel].has(id)) return;
+  st.selectedId = st.selectedId === id ? null : id;
+  refreshSel();
 }
 
 function onHotspotClick(e) {
-  const target = e.currentTarget.dataset.target;
-  if (!state.selectedId) {
+  var target = e.currentTarget.dataset.target;
+  if (!st.selectedId) {
     showToast("⬅️ Select an element first, then tap a hotspot.", false);
     return;
   }
-  attemptMatch(state.selectedId, target);
+  tryMatch(st.selectedId, target);
 }
 
-function refreshSelection() {
-  svg.querySelectorAll(".badge").forEach((b) => {
-    b.classList.toggle("selected", b.dataset.id === state.selectedId);
+function refreshSel() {
+  svg.querySelectorAll(".badge").forEach(function(b){
+    b.classList.toggle("selected", b.dataset.id === st.selectedId);
   });
 }
 
-// ---------- drag-to-connect ----------
-function onBadgePointerDown(e) {
-  const badge = e.currentTarget;
-  const id = badge.dataset.id;
-  if (state.matchedByLevel[state.currentLevel].has(id)) return;
+function onBadgeDown(e) {
+  var badge = e.currentTarget;
+  var id = badge.dataset.id;
+  if (st.matchedByLevel[st.currentLevel].has(id)) return;
 
   badge.setPointerCapture(e.pointerId);
-  const center = badgeCenter(id);
-  state.dragging = { id, pointerId: e.pointerId, moved: false };
+  var center = badgeCenter(id);
+  st.dragging = { id: id, pointerId: e.pointerId, moved: false };
 
   dragLine.setAttribute("x1", center.x);
   dragLine.setAttribute("y1", center.y);
   dragLine.setAttribute("x2", center.x);
   dragLine.setAttribute("y2", center.y);
-  dragLine.style.stroke = elementById(id).color;
+  dragLine.style.stroke = elById(id).color;
   dragLine.removeAttribute("visibility");
 
-  badge.addEventListener("pointermove", onBadgePointerMove);
-  badge.addEventListener("pointerup", onBadgePointerUp);
-  badge.addEventListener("pointercancel", onBadgePointerUp);
+  badge.addEventListener("pointermove", onBadgeMove);
+  badge.addEventListener("pointerup", onBadgeUp);
+  badge.addEventListener("pointercancel", onBadgeUp);
 }
 
-function onBadgePointerMove(e) {
-  if (!state.dragging) return;
-  state.dragging.moved = true;
-  const p = svgPoint(e.clientX, e.clientY);
+function onBadgeMove(e) {
+  if (!st.dragging) return;
+  st.dragging.moved = true;
+  var p = svgPoint(e.clientX, e.clientY);
   dragLine.setAttribute("x2", p.x);
   dragLine.setAttribute("y2", p.y);
 }
 
-function onBadgePointerUp(e) {
-  const badge = e.currentTarget;
-  badge.removeEventListener("pointermove", onBadgePointerMove);
-  badge.removeEventListener("pointerup", onBadgePointerUp);
-  badge.removeEventListener("pointercancel", onBadgePointerUp);
+function onBadgeUp(e) {
+  var badge = e.currentTarget;
+  badge.removeEventListener("pointermove", onBadgeMove);
+  badge.removeEventListener("pointerup", onBadgeUp);
+  badge.removeEventListener("pointercancel", onBadgeUp);
 
   dragLine.setAttribute("visibility", "hidden");
-  if (!state.dragging) return;
-  const { id, moved } = state.dragging;
-  state.dragging = null;
-  if (!moved) return; // treat as a click, handled by onBadgeClick
+  if (!st.dragging) return;
+  var id = st.dragging.id, moved = st.dragging.moved;
+  st.dragging = null;
+  if (!moved) return;
 
-  const p = svgPoint(e.clientX, e.clientY);
-  let closestTarget = null;
-  let closestDist = Infinity;
-  svg.querySelectorAll(`.craftLevel[data-level="${state.currentLevel}"] .hotspot`).forEach((h) => {
-    const c = hotspotCenter(h.dataset.target);
-    const d = Math.hypot(c.x - p.x, c.y - p.y);
+  var p = svgPoint(e.clientX, e.clientY);
+  var closestTarget = null;
+  var closestDist = Infinity;
+  
+  svg.querySelectorAll('.craftLevel[data-level = "' + st.currentLevel + '"] .hotspot').forEach(function(h){
+    var c = hotspotCenter(h.dataset.target);
+    var d = Math.hypot(c.x - p.x, c.y - p.y);
     if (d < closestDist) { closestDist = d; closestTarget = h.dataset.target; }
   });
 
-  const targetEl = closestTarget ? elementByHotspotInCurrentLevel(closestTarget) : null;
-  if (closestTarget && closestDist < 45 && !(targetEl && state.matchedByLevel[state.currentLevel].has(targetEl.id))) {
-    attemptMatch(id, closestTarget);
+  var targetEl = closestTarget ? hotspotEl(closestTarget) : null;
+  if (closestTarget && closestDist < 45 && !(targetEl && st.matchedByLevel[st.currentLevel].has(targetEl.id))) {
+    tryMatch(id, closestTarget);
   }
 }
 
-// ---------- matching ----------
-function attemptMatch(elementId, target) {
-  const el = elementById(elementId);
-  const hotspotEl = svg.querySelector(`.craftLevel[data-level="${state.currentLevel}"] .hotspot[data-target="${target}"]`);
+function tryMatch(elementId, target) {
+  var el = elById(elementId);
+  var hotspotEl = svg.querySelector('.craftLevel[data-level = "' + st.currentLevel + '"] .hotspot[data-target = "' + target + '"]');
 
   if (el.hotspot === target) {
-    state.matchedByLevel[state.currentLevel].add(el.id);
+    st.matchedByLevel[st.currentLevel].add(el.id);
 
-    state.streak += 1;
-    state.bestStreak = Math.max(state.bestStreak, state.streak);
-    const streakBonus = state.streak >= 2 ? (state.streak - 1) * 5 : 0;
-    state.score += 20 + streakBonus;
+    st.streak += 1;
+    st.bestStreak = Math.max(st.bestStreak, st.streak);
+    var streakBonus = st.streak >= 2 ? (st.streak - 1) * 5 : 0;
+    st.score += 20 + streakBonus;
 
-    state.selectedId = null;
+    st.selectedId = null;
     updateHud();
-    refreshSelection();
+    refreshSel();
 
-    svg.querySelector(`.badge[data-id="${el.id}"]`).classList.add("matched");
+    svg.querySelector('.badge[data-id = "' + el.id + '"]').classList.add("matched");
     hotspotEl.classList.add("matched");
-    drawPermanentConnection(el.id, target);
+    drawConn(el.id, target);
 
     showFact(el);
 
     if (el.surpriseFact && Math.random() < 0.2) {
       showSurpriseFact(el);
-    } else if (state.streak >= 3) {
-      showToast(`🔥 ${state.streak} in a row! +${streakBonus} bonus`, true);
+    } else if (st.streak >= 3) {
+      showToast("🔥 " + st.streak + " in a row! +" + streakBonus + " bonus", true);
     } else {
-      showToast(`✅ ${el.name} correctly wired to ${el.use}!`, true);
+      showToast("✅ " + el.name + " correctly wired to " + el.use + "!", true);
     }
   } else {
-    state.score = Math.max(0, state.score - 5);
-    state.streak = 0;
-    state.mistakesByLevel[state.currentLevel] += 1;
+    st.score = Math.max(0, st.score - 5);
+    st.streak = 0;
+    st.mistakesByLevel[st.currentLevel] += 1;
     updateHud();
-    state.selectedId = null;
-    refreshSelection();
+    st.selectedId = null;
+    refreshSel();
 
     hotspotEl.classList.add("wrong");
-    setTimeout(() => hotspotEl.classList.remove("wrong"), 300);
-    const correctEl = elementByHotspotInCurrentLevel(target);
-    showToast(`🚫 Not quite -- that hotspot is for ${correctEl.name} (${correctEl.use}).`, false);
+    setTimeout(function(){ hotspotEl.classList.remove("wrong"); }, 300);
+    var correctEl = hotspotEl(target);
+    showToast("🚫 Not quite -- that hotspot is for " + correctEl.name + " (" + correctEl.use + ").", false);
   }
 }
 
-function drawPermanentConnection(elementId, target) {
-  const a = badgeCenter(elementId);
-  const b = hotspotCenter(target);
-  const midX = (a.x + b.x) / 2;
-  const midY = Math.min(a.y, b.y) - 60;
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", `M ${a.x} ${a.y} Q ${midX} ${midY} ${b.x} ${b.y}`);
+function drawConn(elementId, target) {
+  var a = badgeCenter(elementId);
+  var b = hotspotCenter(target);
+  var midX = (a.x + b.x) / 2;
+  var midY = Math.min(a.y, b.y) - 60;
+  var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", "M " + a.x + " " + a.y + " Q " + midX + " " + midY + " " + b.x + " " + b.y);
   path.setAttribute("class", "connectionLine");
-  path.style.stroke = elementById(elementId).color;
-  activeConnectionsLayer().appendChild(path);
+  path.style.stroke = elById(elementId).color;
+  connLayer().appendChild(path);
 }
 
-// ---------- HUD / toast ----------
 function updateHud() {
-  const lvl = currentLevel();
-  els.scoreVal.textContent = state.score;
-  els.matchVal.textContent = state.matchedByLevel[state.currentLevel].size;
-  els.totalVal.textContent = lvl.elements.length;
-  els.levelsDoneVal.textContent = countLevelsDone();
-  if (els.streakVal) els.streakVal.textContent = state.streak;
+  var lvl = curLvl();
+  ui.scoreVal.textContent = st.score;
+  ui.matchVal.textContent = st.matchedByLevel[st.currentLevel].size;
+  ui.totalVal.textContent = lvl.elements.length;
+  ui.levelsDoneVal.textContent = countDone();
+  if (ui.streakVal) ui.streakVal.textContent = st.streak;
 
-  document.querySelectorAll(".levelTab").forEach((tab) => {
-    tab.classList.toggle("complete", isLevelComplete(tab.dataset.level));
+  document.querySelectorAll(".levelTab").forEach(function(tab){
+    tab.classList.toggle("complete", lvlComplete(tab.dataset.level));
   });
 }
 
 function showToast(msg, good) {
-  els.toast.textContent = msg;
-  els.toast.className = "show" + (good ? " good" : "");
+  ui.toast.textContent = msg;
+  ui.toast.className = "show" + (good ? " good" : "");
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => { els.toast.className = ""; }, 2200);
+  showToast._t = setTimeout(function(){ ui.toast.className = ""; }, 2200);
 }
 
 function showSurpriseFact(el) {
-  els.toast.innerHTML = `✨ <b>Did you know?</b> ${el.surpriseFact}`;
-  els.toast.className = "show good surprise";
+  ui.toast.innerHTML = '✨ <b>Did you know?</b> ' + el.surpriseFact;
+  ui.toast.className = "show good surprise";
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => { els.toast.className = ""; }, 4500);
+  showToast._t = setTimeout(function(){ ui.toast.className = ""; }, 4500);
 }
 
-// ---------- fact modal ----------
 function showFact(el) {
   document.getElementById("factHead").innerHTML =
-    `<h1>✅ Connection Made!</h1><p class="sub">${el.name} wired to ${el.use}.</p>`;
-  document.getElementById("factCard").innerHTML = `
-    <div class="tag">${el.symbol} · ${el.use}</div>
-    <div class="ttl">${el.name}</div>
-    <div class="body">${el.fact}</div>
-  `;
+    '<h1>✅ Connection Made!</h1><p class="sub">' + el.name + ' wired to ' + el.use + '.</p>';
+  document.getElementById("factCard").innerHTML = 
+    '<div class="tag">' + el.symbol + ' · ' + el.use + '</div>' +
+    '<div class="ttl">' + el.name + '</div>' +
+    '<div class="body">' + el.fact + '</div>';
   document.getElementById("factOverlay").classList.add("show");
 }
-document.getElementById("factContinueBtn").addEventListener("click", () => {
+
+document.getElementById("factContinueBtn").addEventListener("click", function(){
   document.getElementById("factOverlay").classList.remove("show");
-  checkLevelCompletionAfterFact();
+  checkAfterFact();
 });
 
-// ---------- level-complete / win flow ----------
-function checkLevelCompletionAfterFact() {
-  if (!isLevelComplete(state.currentLevel)) return;
-  if (countLevelsDone() === LEVELS.length) {
+function checkAfterFact() {
+  if (!lvlComplete(st.currentLevel)) return;
+  if (countDone() === LEVELS.length) {
     showWin();
   } else {
-    showLevelComplete(currentLevel());
+    showLvlComplete(curLvl());
   }
 }
 
-function showLevelComplete(lvl) {
-  const stars = starsForLevel(lvl.id);
+function showLvlComplete(lvl) {
+  var stars = starsFor(lvl.id);
   document.getElementById("levelCompleteText").innerHTML =
-    `You've wired up every material on the ${lvl.label}.<br><span style="font-size:1.4rem">${starString(stars)}</span><br>Ready for the next challenge?` + "\n" + `You've got this!!!`;
+    "You've wired up every material on the " + lvl.label + ".<br><span style=\"font-size:1.4rem\">" + starStr(stars) + "</span><br>Ready for the next challenge?\nYou've got this!!!";
   document.getElementById("levelOverlay").classList.add("show");
 }
-document.getElementById("nextLevelBtn").addEventListener("click", () => {
+
+document.getElementById("nextLevelBtn").addEventListener("click", function(){
   document.getElementById("levelOverlay").classList.remove("show");
-  const next = LEVELS.find((l) => !isLevelComplete(l.id));
+  var next = null;
+  for (var i=0; i<LEVELS.length; i++) {
+    if (!lvlComplete(LEVELS[i].id)) { next = LEVELS[i]; break; }
+  }
   if (next) switchLevel(next.id);
 });
 
 function showWin() {
-  document.getElementById("finalScore").textContent = state.score;
-  const glossary = document.getElementById("winGlossary");
-  glossary.innerHTML = `<div style="text-align:center;margin-bottom:10px">
-    Best streak: 🔥${state.bestStreak} &nbsp;|&nbsp;
-    ${LEVELS.map(l => `${l.icon} ${starString(starsForLevel(l.id))}`).join("  ")}
-  </div>`;
-  LEVELS.forEach((lvl) => {
-    lvl.elements.forEach((el) => {
-      const item = document.createElement("div");
+  document.getElementById("finalScore").textContent = st.score;
+  var glossary = document.getElementById("winGlossary");
+  var html = '<div style="text-align:center;margin-bottom:10px">' +
+    'Best streak: 🔥' + st.bestStreak + ' &nbsp;|&nbsp; ';
+  for (var i=0; i<LEVELS.length; i++) {
+    html += LEVELS[i].icon + ' ' + starStr(starsFor(LEVELS[i].id)) + '  ';
+  }
+  html += '</div>';
+  glossary.innerHTML = html;
+  
+  LEVELS.forEach(function(lvl){
+    lvl.elements.forEach(function(el){
+      var item = document.createElement("div");
       item.className = "glItem";
-      item.innerHTML = `<div class="h">${lvl.icon} ${el.symbol} ${el.name} — ${el.use}</div><div class="b">${el.fact}</div>`;
+      item.innerHTML = '<div class="h">' + lvl.icon + ' ' + el.symbol + ' ' + el.name + ' — ' + el.use + '</div><div class="b">' + el.fact + '</div>';
       glossary.appendChild(item);
     });
   });
+  
   document.getElementById("winOverlay").classList.add("show");
 }
+
 document.getElementById("playAgainBtn").addEventListener("click", resetGame);
 document.getElementById("resetBtn").addEventListener("click", resetGame);
 
-// ---------- reset ----------
 function resetGame() {
-  state.score = 0;
-  state.matchedByLevel = Object.fromEntries(LEVELS.map((l) => [l.id, new Set()]));
-  state.selectedId = null;
-  state.dragging = null;
-  state.streak = 0;
-  state.bestStreak = 0;
-  state.mistakesByLevel = Object.fromEntries(LEVELS.map((l) => [l.id, 0]));
+  st.score = 0;
+  st.matchedByLevel = {};
+  st.selectedId = null;
+  st.dragging = null;
+  st.streak = 0;
+  st.bestStreak = 0;
+  st.mistakesByLevel = {};
+  
+  for (var i=0; i<LEVELS.length; i++) {
+    st.matchedByLevel[LEVELS[i].id] = new Set();
+    st.mistakesByLevel[LEVELS[i].id] = 0;
+  }
 
-  svg.querySelectorAll(".connections").forEach((g) => { g.innerHTML = ""; });
-  svg.querySelectorAll(".badge").forEach((b) => b.classList.remove("matched", "selected"));
-  svg.querySelectorAll(".hotspot").forEach((h) => h.classList.remove("matched", "wrong"));
+  svg.querySelectorAll(".connections").forEach(function(g){ g.innerHTML = ""; });
+  svg.querySelectorAll(".badge").forEach(function(b){ b.classList.remove("matched", "selected"); });
+  svg.querySelectorAll(".hotspot").forEach(function(h){ h.classList.remove("matched", "wrong"); });
 
   document.getElementById("winOverlay").classList.remove("show");
   document.getElementById("factOverlay").classList.remove("show");
