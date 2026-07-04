@@ -7,7 +7,370 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- TODO: fix safari zoom issue on input focus -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title> Element Navigator: Connect the Tech</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header id="topbar">
+<div class="brand">FROM ELEMENTS TO ENGINEERING MARVELS</div>
+<div class="stats">
+
+<button id="resetBtn" onclick="console.log('reset clicked')">Reset</button>
+</header>
+
+<main>
+
+<nav id="levelTabs">
+<button class="levelTab" data-level="rocket">Rocket</button>
+<button class="levelTab" data-level="shuttle">Space Shuttle</button>
+<button class="levelTab" data-level="jet">Fighter Jet</button>
+<button class="levelTab" data-level="probe">Space Probe</button>
+</nav>
+
+<span id="scoreboard">
+<span>Score: <b id="scoreVal">0</b></span>
+<span>Matched: <b id="matchVal">0</b>/<span id="totalVal">0</span></span>
+<span class="levelsDone">Levels: <b id="levelsDoneVal">0</b>/<span id="levelsTotalVal">4</span></span>
+</span>
+
+<p id="instructions">
+    <b>HOW TO PLAY:</b> Drag a line from each <b>element</b> to the part of the <span id="craftNameLabel">spacecraft</span> that uses it or tap an element, then tap the matching part.
+</p>
+
+<div id="stars"></div>
+
+<svg id="scene" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" touch-action="none">
+
+<defs>
+
+<filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+<feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000814" flood-opacity="0.55"/>
+</filter>
+
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+<feGaussianBlur stdDeviation="6" result="blur"/>
+<feMerge>
+<feMergeNode in="blur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+
+<!-- decorative orbit ring -->
+<ellipse cx="500" cy="300" rx="440" ry="180" class="orbitRing"/>
+<circle cx="905" cy="560" r="40" class="planet"/>
+<circle cx="60" cy="90" r="18" class="planet planet--small"/>
+
+<!-- ===================== dragLine (shared) ===================== -->
+<line id="dragLine" x1="0" y1="0" x2="0" y2="0" class="dragLine" visibility="hidden"/>
+
+<!-- =========================================================
+         LEVEL 1: ROCKET
+    ========================================================== -->
+<g class="craftLevel" data-level="rocket">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="-30" width="950" height="620" rx="18"/>
+<text class="placeholderText" x="505" y="310">Add rocket.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="rocket.png" x="30" y="-30" width="950" height="700" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="r_heatshield">
+<circle cx="677" cy="101" r="8" class="hotspotDot"/>
+<text x="691" y="110" class="hotspotLabel">Heatshield / Nose Cone</text>
+</g>
+
+<g class="hotspot" data-target="r_airframe">
+<circle cx="575" cy="210" r="8" class="hotspotDot"/>
+<text x="505" y="210" class="hotspotLabel">Airframe</text>
+</g>
+<g class="hotspot" data-target="r_propellant">
+<circle cx="505" cy="280" r="8" class="hotspotDot"/>
+<text x="425" y="290" class="hotspotLabel">Propellant</text>
+</g>
+<g class="hotspot" data-target="r_cooling">
+<circle cx="455" cy="335" r="8" class="hotspotDot"/>
+<text x="335" y="335" class="hotspotLabel">Cooling System</text>
+</g>
+<g class="hotspot" data-target="r_nozzle">
+<circle cx="385" cy="392" r="8" class="hotspotDot"/>
+<text x="415" y="392" class="hotspotLabel">Nozzle</text>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="r_alli" transform="translate(528,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Al-Li</text>
+<text y="52" class="badgeName">Aluminium-Lithium</text><text y="68" class="badgeName">Alloy</text>
+</g>
+<g class="badge" data-id="r_niobium" transform="translate(895,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Nb</text>
+<text y="52" class="badgeName">Niobium</text>
+</g>
+<g class="badge" data-id="r_copper" transform="translate(775,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Cu</text>
+<text y="52" class="badgeName">Copper</text>
+</g>
+<g class="badge" data-id="r_carbon" transform="translate(403,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">C</text>
+<text y="52" class="badgeName">Carbon</text>
+</g>
+<g class="badge" data-id="r_propellant" transform="translate(652,482)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">H2(L)/O2(L)</text>
+<text y="52" class="badgeName">Liquid Hydrogen /</text><text y="68" class="badgeName">Liquid Oxygen</text>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 2: SPACE SHUTTLE
+    ========================================================== -->
+<g class="craftLevel" data-level="shuttle">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderText" x="505" y="310">Add shuttle.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="shuttle.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="s_nosecap">
+<circle cx="225" cy="305" r="8" class="hotspotDot"/>
+<text x="241" y="310" class="hotspotLabel">Nosecap & Wing Leading Edges</text>
+</g>
+<g class="hotspot" data-target="s_fuselage">
+<circle cx="495" cy="309" r="8" class="hotspotDot"/>
+<text x="511" y="309" class="hotspotLabel">Fuselage & Primary Structure</text>
+</g>
+<g class="hotspot" data-target="s_upperwing">
+<circle cx="756" cy="295" r="8" class="hotspotDot"/>
+<text x="772" y="299" class="hotspotLabel">Upper Surface Insulation</text>
+</g>
+<g class="hotspot" data-target="s_fittings">
+<circle cx="713" cy="385" r="8" class="hotspotDot"/>
+<text x="729" y="399" class="hotspotLabel">Hot Structural Fittings</text>
+</g>
+<g class="hotspot" data-target="s_belly">
+<circle cx="367" cy="395" r="8" class="hotspotDot"/>
+<text x="377" y="403" class="hotspotLabel">Underside Heatshield Tiles</text>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="s_rcc" transform="translate(100,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">RCC</text>
+<text y="52" class="badgeName">Reinforced Carbon-Carbon</text>
+</g>
+<g class="badge" data-id="s_silica" transform="translate(346,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">SiO_2</text>
+<text y="52" class="badgeName">Silica</text>
+</g>
+<g class="badge" data-id="s_aluminum" transform="translate(223,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Al</text>
+<text y="52" class="badgeName">Aluminum</text>
+</g>
+<g class="badge" data-id="s_inconel" transform="translate(469,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Ni-Cr</text>
+<text y="52" class="badgeName">Inconel</text>
+</g>
+<g class="badge" data-id="s_nomex" transform="translate(590,525)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Nmx</text>
+<text y="52" class="badgeName">Nomex</text>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 3: FIGHTER JET
+    ========================================================== -->
+<g class="craftLevel" data-level="jet">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderText" x="505" y="310">Add jet.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="jet.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="hyp_leading_edge">
+<circle cx="808" cy="239" r="8" class="hotspotDot"/>
+<text x="824" y="239" class="hotspotLabel">Leading Edges</text>
+</g>
+<g class="hotspot" data-target="hyp_airframe">
+<circle cx="498" cy="272" r="8" class="hotspotDot"/>
+<text x="514" y="272" class="hotspotLabel">Airframe Skin</text>
+</g>
+<g class="hotspot" data-target="hyp_thermal">
+<circle cx="573" cy="325" r="8" class="hotspotDot"/>
+<text x="589" y="325" class="hotspotLabel">Thermal Protection Tiles</text>
+</g>
+<g class="hotspot" data-target="hyp_combustor">
+<circle cx="358" cy="375" r="8" class="hotspotDot"/>
+<text x="374" y="375" class="hotspotLabel">Combustor Walls</text>
+</g>
+<g class="hotspot" data-target="hyp_turbine">
+<circle cx="141" cy="375" r="8" class="hotspotDot"/>
+<text x="157" y="375" class="hotspotLabel">Engine Turbine Blades</text>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="hyp_hafnium_carbide" transform="translate(120,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">HfC</text>
+<text y="52" class="badgeName">Hafnium Carbide</text>
+</g>
+<g class="badge" data-id="hyp_titanium_aluminide" transform="translate(265,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">TiAl</text>
+<text y="52" class="badgeName">Titanium Aluminide</text>
+</g>
+<g class="badge" data-id="hyp_silicon_carbide" transform="translate(410,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">SiC</text>
+<text y="52" class="badgeName">Silicon Carbide</text>
+</g>
+<g class="badge" data-id="hyp_rhenium_niobium" transform="translate(552,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">ReNb</text>
+<text y="52" class="badgeName">Rhenium Niobium</text>
+</g>
+<g class="badge" data-id="hyp_rhenium_nickel" transform="translate(695,497)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">ReNi</text>
+<text y="52" class="badgeName">Rhenium Nickel</text>
+</g>
+</g>
+</g>
+
+<!-- =========================================================
+         LEVEL 4: SPACE PROBE
+    ========================================================== -->
+<g class="craftLevel" data-level="probe">
+<g class="craftArt" filter="url(#softShadow)">
+<rect class="craftPlaceholder" x="30" y="0" width="950" height="620" rx="18"/>
+<text class="placeholderText" x="505" y="310">Add probe.png here</text>
+<text class="placeholderSub" x="505" y="332">Drop a photo into the project folder</text>
+<image class="craftPhoto" href="probe.png" x="30" y="0" width="950" height="620" opacity="0"/>
+</g>
+
+<g class="connections"></g>
+
+<g class="hotspots">
+<g class="hotspot" data-target="pb_structural">
+<circle cx="342" cy="353" r="8" class="hotspotDot"/>
+<text x="360" y="357" class="hotspotLabel">Structural Components & Mirrors</text>
+</g>
+<g class="hotspot" data-target="pb_rtg">
+<circle cx="435" cy="242" r="8" class="hotspotDot"/>
+<text x="455" y="247" class="hotspotLabel">RTG</text>
+</g>
+<g class="hotspot" data-target="pb_electronics">
+<circle cx="307" cy="263" r="8" class="hotspotDot"/>
+<text x="325" y="267" class="hotspotLabel">Onboard Electronics (Capacitors)</text>
+</g>
+<g class="hotspot" data-target="pb_plating">
+<circle cx="690" cy="453" r="8" class="hotspotDot"/>
+<text x="708" y="457" class="hotspotLabel">Corrosion Resistant Plating</text>
+</g>
+<g class="hotspot" data-target="pb_ion">
+<circle cx="283" cy="151" r="8" class="hotspotDot"/>
+<text x="303" y="155" class="hotspotLabel">Ion Propulsion</text>
+</g>
+</g>
+
+<g class="badges">
+<g class="badge" data-id="pb_plutonium" transform="translate(118,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Pu</text>
+<text y="52" class="badgeName">Plutonium</text>
+</g>
+<g class="badge" data-id="pb_xenon" transform="translate(265,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Xe</text>
+<text y="52" class="badgeName">Xenon</text>
+</g>
+<g class="badge" data-id="pb_tantalum" transform="translate(409.5,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Ta</text>
+<text y="52" class="badgeName">Tantalum</text>
+</g>
+<g class="badge" data-id="pb_beryllium" transform="translate(554,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Be</text>
+<text y="52" class="badgeName">Beryllium</text>
+</g>
+<g class="badge" data-id="pb_gold" transform="translate(698,556)">
+<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<text class="badgeSymbol">Au</text>
+<text y="52" class="badgeName">Gold</text>
+</g>
+</g>
+</g>
+
+</svg>
+</main>
+
+<!-- FACT MODAL -->
+<div class="overlay" id="factOverlay">
+<div class="modal">
+<div id="factHead"></div>
+<div class="factCard" id="factCard"></div>
+<button class="btn" id="factContinueBtn">Continue →</button>
+</div>
+</div>
+
+<!-- LEVEL COMPLETE MODAL -->
+<div class="overlay" id="levelOverlay">
+<div class="modal">
+<h1>Level Complete!</h1>
+<p class="sub" id="levelCompleteText"></p>
+<button class="btn" id="nextLevelBtn">Next Level →</button>
+</div>
+</div>
+
+<!-- WIN MODAL -->
+<div class="overlay" id="winOverlay">
+<div class="modal">
+<h1>All Elements Matched!</h1>
+<p class="sub">Final score: <b id="finalScore">0</b></p>
+<div id="winGlossary"></div>
+<button class="btn" id="playAgainBtn">Play Again</button>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- TODO: add more levels here -->
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script>console.log('page loaded v1.2');</script>
+</body>
+</html>
 
 <header id="topbar">
 <div class="brand" preserveAspectRatio="xMidYTop meet">FROM ELEMENTS TO ENGINEERING MARVELS</div>
