@@ -1,19 +1,15 @@
-# Match the Right Material for Extreme Engineered Parts
+# Element Multiverse
 
-## How this game works?
-
-This is a drag-and-connect game that teaches players *why* specific chemical elements matter to real spacecraft. No memorizing the periodic table out of context.
-
-You get four vehicles — a **Rocket**, a **Space Shuttle**, a **Fighter Jet**, and a **Probe**. For each one, you figure out which five elements make it work and why.
-
-Drag the element to the part of the spacecraft it powers, cools, lights up, or holds together.
+## What's this?
+A game where you drag elements onto spacecraft parts — rocket, shuttle, fighter jet, deep-space probe — and learn why each element matters. Just match, connect, and see what makes these machines survive the impossible.
 
 ## Why I built this
+I love STEM. Every time I read about some wild breakthrough - a rocket landing itself, a probe running for 40 years in deep space - I end up asking the same question: what is this thing actually made of? The answer is always elements. Specific, fascinating, extreme elements. That's the magic I wanted to share.
 
-As a STEM enthusiast, every scientific breakthrough bowled me over and each time I ended up with this profound thought that the power and magic behind every breakthrough technology in devices can be owed to the material - Elements that it is made out of.
-
-I started with the Space & Aviation domain as it is where the most astounding and challenging elements and compounds are used.
+Space and aviation felt like the right place to start, because that's where engineers use the most incredible materials on Earth.
 
 ## What's next
-
-Expanding from space and aviation tech, I am keen on adding more domains viz: Advanced Computing & Electronics, Future Transportation, Mega Renewable Energy Systems, Extreme Scientific Machines and Bioengineering.
+This is just the beginning. I want to keep building domains like:
+- Deep Earth
+- Military
+- Underwater
