@@ -1,97 +1,273 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+/* ============================================
+   Element Navigator - My Styling
+   ============================================ */
 
-:root{--page:#5100ff;--paper:#5101ff;--ink:#ffffff;--ink-dim:#ffffff;--line:#d6dee8;
---amber:#c9832e;--teal:#0e7c86;--violet:#6c0085;--crimson:#b8393f;
---good:#1f8a4c;--bad:#c23b3b;
---serif:'IBM Plex Serif',serif;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
-font-family:var(--sans)}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:url('space.png') center/cover no-repeat,linear-gradient(180deg,#0d1220,#05060f);
-  color:var(--ink);display:flex;flex-direction:column;align-items:center;padding-bottom:48px}
+/* ---- basic reset ---- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* ---- header: stacked title block ---- */
-#topbar{width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding:24px 32px;background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-.brand{font-family:var(--serif);font-weight:600;font: size 15px;color:var(--ink)}
-.brand::before{color:var(--violet);font: size 13px}
-.stats{display:flex;gap:20px;font-family:var(--mono);font: size 13px;;color:var(--ink-dim)}
-.stats b{color:var(--ink)}
-#resetBtn{background:var(--paper);border:1px solid var(--ink);color:var(--ink);padding:7px 16px;border-radius:2px;cursor:pointer;font-family:var(--mono);font: size 13px;text-transform:uppercase;letter-spacing:.04em}
-#resetBtn:hover{background:var(--ink);color:var(--paper)}
-#resetBtn:active{transform:scale(.96)}
+body {
+  /* TODO: pick your own background - maybe a dark color or space image */
+  background: #95e7fb;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
 
-/* ---- tabs: auto-numbered like table groups ---- */
-#levelTabs{counter-reset:grp;display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;justify-content:center;padding:0 16px}
-.levelTab{counter-increment:grp;position:relative;background:#ffffff;border:1px solid var(--line);border-top:3px solid var(--amber);color:var(--ink-dim);padding:12px 20px 10px;border-radius:2px;font-family:var(--mono);font: size 13px;;font-weight:600;text-transform:uppercase;cursor:pointer;transition:.15s}
-.levelTab::before{content:counter(grp,decimal-leading-zero);display:block;font: size 13px;color:var(--ink-dim);opacity:.6;margin-bottom:2px}
-.levelTab:nth-child(2){color:var(--teal)}
-.levelTab:nth-child(3){color:var(--violet)}
-.levelTab:nth-child(4){color:var(--crimson)}
-.levelTab:hover{background:var(--page);color:var(--ink)}
-.levelTab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.levelTab.active::before{color:var(--paper);opacity:.7}
-.levelTab.complete::after{content:"✓";margin-left:6px;color:var(--good)}
-.levelTab.active.complete::after{color:#8fe3ab}
+/* ---- header ---- */
+#topbar {
+  /* TODO: style the top bar */
+  background: #151a25;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
 
-#instructions{max-width:640px;text-align:center;color:#ffffff;font: size 13px;line-height:1.6;margin:16px 20px 8px;font-style:italic}
-#instructions b{color:#ffffff;font-family:var(--mono);font-style:normal;font-weight:600}
+.brand {
+  /* TODO: make the title stand out */
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+}
 
-/* ---- board: framed like an instrument viewport ---- */
-#stars{position:absolute;inset:0;pointer-events:none}
-.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.9}}
-#scene{width:100%;height:100%;display:block}
-.orbitRing{fill:none;stroke:rgba(255,255,255,.08);stroke-width:1.5;stroke-dasharray:4 8}
-.planet{fill:#1a2340;opacity:.5}.planet--small{fill:#251a40}
-.craftLevel{display:none}.craftLevel.activeLevel{display:block}
-.craftPlaceholder{fill:rgba(148,163,184,.05);stroke:rgba(148,163,184,.3);stroke-width:2;stroke-dasharray:10 8}
-.placeholderIcon{text-anchor:middle;font: size 46px;opacity:.5}
-.placeholderText{text-anchor:middle;fill:#8291ab;font: size 20px;font-weight:700;font-family:var(--serif)}
-.placeholderSub{text-anchor:middle;fill:#8291ab;font: size 15px;opacity:.75}
-.craftPhoto{transition:opacity .4s}
-.craftArt.hasPhoto .craftPlaceholder,.craftArt.hasPhoto .placeholderIcon,.craftArt.hasPhoto .placeholderText,.craftArt.hasPhoto .placeholderSub{display:none}
+/* ---- level tabs ---- */
+#levelTabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px 0;
+}
 
-.hotspot{cursor:pointer}
-.hotspotDot{fill:var(--amber)}
-.hotspotLabel{fill:#c7d0dc;font-family:var(--mono);font-size:15px;font-weight:600;paint-order:stroke;stroke:#05060f;stroke-width:4px}
-.hotspot.matched .hotspotDot,.hotspot.matched .hotspotLabel{fill:var(--good)}
-.hotspot.wrong .hotspotDot{fill:var(--bad)}
-.connectionLine{fill:none;stroke-width:3.5;stroke-linecap:round;filter:url(#glow);opacity:.9}
-.dragLine{stroke-width:3;stroke-linecap:round;stroke-dasharray:6 6;opacity:.85}
+.levelTab {
+  /* TODO: style unselected tabs */
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #333;
+  padding: 10px 18px;
+  cursor: pointer;
+}
 
-/* ---- badges: element cells ---- */
-.badge{cursor:pointer;touch-action:none}
-.badgeCircle{fill:rgba(255,255,255,.04);stroke:var(--c,#2e76c9);stroke-width:3;clip-path:inset(2% round 3px);transition:filter .15s,transform .15s}
-.badgeSymbol{text-anchor:middle;dominant-baseline:middle;font-family:var(--mono);font-size:22px;font-weight:700;fill:#eef2f6}
-.badgeName{text-anchor:middle;font-family:var(--sans);font-size:11px;font-weight:600;fill:#8291ab;text-transform:uppercase;letter-spacing:.04em}
-.badge:hover .badgeCircle{filter:drop-shadow(0 0 10px var(--c))}
-.badge.selected .badgeCircle{filter:drop-shadow(0 0 16px var(--c));stroke-width:5}
-.badge.matched{opacity:.35;pointer-events:none}
-.badge.matched .badgeCircle{fill:var(--c)}
-.badgePhoto{transition:opacity .3s}
-.badge.hasPhoto .badgeSymbol{display:none}
+.levelTab.active {
+  /* TODO: style the active/selected tab */
+  background: #ebed6b;
+  color: #000000;
+}
 
-/* ---- toast: data-chip style ---- */
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);border-left:3px solid var(--amber);padding:11px 20px;border-radius:2px;font-family:var(--sans);font: size 13px;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90vw;text-align:center}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#toast.good{border-left-color:var(--good)}
-#toast.surprise{background:#2a1f47;border-left-color:var(--violet);box-shadow:0 0 20px rgba(109,74,255,.3);max-width:420px}
+/* ---- scoreboard ---- */
+#scoreboard {
+  /* TODO: center it, pick a font size */
+  display: block;
+  text-align: center;
+  margin-bottom: 12px;
+  color: #a20101;
+}
 
-/* ---- modals: data sheet style ---- */
-.overlay{position:fixed;inset:0;background:rgba(17,28,45,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;padding:20px}
-.overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--violet);border-radius:2px;padding:32px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;text-align:center;box-shadow:0 20px 50px rgba(17,28,45,.25)}
-.modal h1{margin:0 0 8px;font-family:var(--serif);font: size 15px;;color:var(--ink)}
-.modal .sub{color:var(--ink-dim);margin-bottom:18px;font: size 13px;}
-.factCard{background:var(--page);border:1px solid var(--line);border-radius:2px;padding:18px;text-align:left;margin-bottom:20px}
-.factCard .tag{font-family:var(--mono);font: size 13px;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.factCard .ttl{font-family:var(--serif);font: size 15px;font-weight:600;margin-bottom:10px;color:var(--ink)}
-.factCard .body{color:var(--ink-dim);line-height:1.6;font: size 13px}
-.btn{background:var(--ink);border:none;color:var(--paper);font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:12px 26px;border-radius:2px;cursor:pointer;font: size 13px;transition:.15s}
-.btn:hover{background:var(--violet)}
-.btn:active{transform:scale(.97)}
-#winGlossary{text-align:left;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
-.glItem{background:var(--page);border:1px solid var(--line);border-left:3px solid var(--crimson);border-radius:2px;padding:10px 14px}
-.glItem .h{font-family:var(--mono);font-weight:700;margin-bottom:4px;font: size 13px;color:var(--ink)}
-.glItem .b{color:var(--ink-dim);font: size 13px;line-height:1.45}
+/* ---- instructions ---- */
+#instructions {
+  /* TODO: style the how-to-play text */
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 16px;
+  color: #000000;
+}
 
-@media (max-width:640px){#topbar{padding:16px 18px}.stats{gap:12px;font: size 13px;}.brand{font: size 15px;}}
+/* ---- game board (SVG) ---- */
+#scene {
+  width: 100%;
+  max-width: 1000px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ---- hotspots (the dots on the craft) ---- */
+.hotspotDot {
+  /* TODO: pick a color for the clickable dots */
+  fill: #ff9800;
+}
+
+.hotspotLabel {
+  /* TODO: style the text labels near dots */
+  fill: #000000;
+  font-size: 13px;
+}
+
+.hotspot.matched .hotspotDot {
+  /* TODO: color when correctly matched */
+  fill: #4df352;
+}
+
+.hotspot.wrong .hotspotDot {
+  /* TODO: color when wrong guess */
+  fill: #f44336;
+}
+
+/* ---- element badges ---- */
+.badgeCircle {
+  /* TODO: style the circular badges */
+  fill: rgba(255, 255, 255, 0.05);
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+.badgeSymbol {
+  /* TODO: style the element symbol text (e.g. "Al", "Cu") */
+  fill: #000000;
+  font-size: 20px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+.badgeName {
+  /* TODO: style the element name below the symbol */
+  fill: #000000;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+.badge.selected .badgeCircle {
+  /* TODO: highlight when user selects a badge */
+  stroke-width: 5;
+  filter: drop-shadow(0 0 10px #e6f74f);
+}
+
+.badge.matched {
+  /* TODO: fade out or change look when already matched */
+  opacity: 0.3;
+  pointer-events: none;
+  color: #9deb4e;
+}
+
+/* ---- connection lines ---- */
+.connectionLine {
+  /* TODO: style the lines drawn between badge and hotspot */
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.dragLine {
+  /* TODO: style the line while dragging */
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+  opacity: 0.8;
+}
+
+/* ---- toast notifications ---- */
+#toast {
+  /* TODO: style the popup messages at the bottom */
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#toast.show {
+  opacity: 1;
+}
+
+#toast.good {
+  /* TODO: style correct-match toasts */
+  border-left: 3px solid #4caf50;
+}
+
+/* ---- modals (fact cards, level complete, win screen) ---- */
+.overlay {
+  /* TODO: dark semi-transparent backdrop */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  /* TODO: style the popup box */
+  background: #1a1f2e;
+  border: 1px solid #333;
+  padding: 28px;
+  max-width: 460px;
+  width: 90%;
+  text-align: center;
+}
+
+.btn {
+  /* TODO: style buttons inside modals */
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 10px 22px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+/* ---- responsive tweaks for mobile ---- */
+@media (max-width: 640px) {
+  #topbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .levelTab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Hide all craft levels by default */
+.craftLevel {
+  display: none;
+}
+
+/* Only show the active one */
+.craftLevel.activeLevel {
+  display: block;
+}
+
+.orbitRing {
+  fill: #ffffff;
+  stroke: rgba(255,255,255,.08);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 8;
+}
+
+.planet {
+  fill: #ffffff;
+  opacity: .5;
+}
+
+.planet--small {
+  fill: #ffffff;
+}
+
+#resetBtn {
+  /* Move it */
+  margin-left: auto;         /* pushes to far right */
+  
+  /* Enlarge & recolor */
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: bold;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
