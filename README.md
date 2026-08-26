@@ -16,7 +16,7 @@ An interactive browser game where you drag elements onto spacecraft parts (rocke
 - Surprise facts - 20% chance of bonus trivia on any correct match
 - Scoring & streak system - escalating bonuses for consecutive correct answers
 - Star ratings - 3/2/1 stars based on mistakes per level
-- Zero dependencies - vanilla HTML, CSS, JS only
+- Zero dependencies - HTML, CSS, JS only
 
 ## Tech Stack
 - HTML
@@ -24,7 +24,7 @@ An interactive browser game where you drag elements onto spacecraft parts (rocke
 - JavaScript
 
 ## Why I Built This
-Every time I read about a rocket landing itself or a probe surviving 40 years in deep space, I ask: what is this thing actually made of? The answer is always elements — specific, fascinating, extreme elements. This game is my way of making that wonder clickable.
+Every time I read about a rocket landing itself or a probe surviving 40 years in deep space, I ask: what is this thing actually made of? The answer is always elements - specific, fascinating, extreme elements. This game is my way of making that wonder clickable.
 
 ## Roadmap
 - Deep Earth (drilling, geothermal)
