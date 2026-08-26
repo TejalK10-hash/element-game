@@ -8,7 +8,9 @@ Pick a spacecraft level, then drag element badges onto the right parts. If you g
 
 ## What I used
 
-HTML, CSS, and JavaScript. No frameworks.
+- HTML
+- CSS
+- JavaScript
 
 ## What was tricky
 
