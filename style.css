@@ -1,8 +1,6 @@
 /* ============================================
-   Element Navigator - My Styling
+   Element Navigator
    ============================================ */
-
-/* ---- basic reset ---- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -10,7 +8,6 @@
 }
 
 body {
-  /* TODO: pick your own background - maybe a dark color or space image */
   background: #95e7fb;
   color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
@@ -19,7 +16,6 @@ body {
 
 /* ---- header ---- */
 #topbar {
-  /* TODO: style the top bar */
   background: #151a25;
   padding: 16px 24px;
   display: flex;
@@ -29,7 +25,6 @@ body {
 }
 
 .brand {
-  /* TODO: make the title stand out */
   font-size: 24px;
   font-weight: bold;
   color: #ffffff;
@@ -44,7 +39,6 @@ body {
 }
 
 .levelTab {
-  /* TODO: style unselected tabs */
   background: #ffffff;
   color: #000000;
   border: 1px solid #333;
@@ -53,14 +47,12 @@ body {
 }
 
 .levelTab.active {
-  /* TODO: style the active/selected tab */
   background: #ebed6b;
   color: #000000;
 }
 
 /* ---- scoreboard ---- */
 #scoreboard {
-  /* TODO: center it, pick a font size */
   display: block;
   text-align: center;
   margin-bottom: 12px;
@@ -69,7 +61,6 @@ body {
 
 /* ---- instructions ---- */
 #instructions {
-  /* TODO: style the how-to-play text */
   text-align: center;
   max-width: 600px;
   margin: 0 auto 16px;
@@ -84,38 +75,32 @@ body {
   margin: 0 auto;
 }
 
-/* ---- hotspots (the dots on the craft) ---- */
+/* ---- hotspots ---- */
 .hotspotDot {
-  /* TODO: pick a color for the clickable dots */
   fill: #ff9800;
 }
 
 .hotspotLabel {
-  /* TODO: style the text labels near dots */
   fill: #000000;
   font-size: 13px;
 }
 
 .hotspot.matched .hotspotDot {
-  /* TODO: color when correctly matched */
   fill: #4df352;
 }
 
 .hotspot.wrong .hotspotDot {
-  /* TODO: color when wrong guess */
   fill: #f44336;
 }
 
 /* ---- element badges ---- */
 .badgeCircle {
-  /* TODO: style the circular badges */
   fill: rgba(255, 255, 255, 0.05);
   stroke: #000000;
   stroke-width: 3;
 }
 
 .badgeSymbol {
-  /* TODO: style the element symbol text (e.g. "Al", "Cu") */
   fill: #000000;
   font-size: 20px;
   font-weight: bold;
@@ -123,43 +108,35 @@ body {
 }
 
 .badgeName {
-  /* TODO: style the element name below the symbol */
   fill: #000000;
   font-size: 11px;
   text-anchor: middle;
 }
 
 .badge.selected .badgeCircle {
-  /* TODO: highlight when user selects a badge */
   stroke-width: 5;
   filter: drop-shadow(0 0 10px #e6f74f);
 }
 
 .badge.matched {
-  /* TODO: fade out or change look when already matched */
   opacity: 0.3;
   pointer-events: none;
   color: #9deb4e;
 }
 
-/* ---- connection lines ---- */
 .connectionLine {
-  /* TODO: style the lines drawn between badge and hotspot */
   fill: none;
   stroke-width: 3;
   stroke-linecap: round;
 }
 
 .dragLine {
-  /* TODO: style the line while dragging */
   stroke-width: 2;
   stroke-dasharray: 6 6;
   opacity: 0.8;
 }
 
-/* ---- toast notifications ---- */
 #toast {
-  /* TODO: style the popup messages at the bottom */
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -181,9 +158,7 @@ body {
   border-left: 3px solid #4caf50;
 }
 
-/* ---- modals (fact cards, level complete, win screen) ---- */
 .overlay {
-  /* TODO: dark semi-transparent backdrop */
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
@@ -200,7 +175,6 @@ body {
 }
 
 .modal {
-  /* TODO: style the popup box */
   background: #1a1f2e;
   border: 1px solid #333;
   padding: 28px;
@@ -210,7 +184,6 @@ body {
 }
 
 .btn {
-  /* TODO: style buttons inside modals */
   background: #fff;
   color: #000;
   border: none;
@@ -219,7 +192,6 @@ body {
   margin-top: 16px;
 }
 
-/* ---- responsive tweaks for mobile ---- */
 @media (max-width: 640px) {
   #topbar {
     flex-direction: column;
@@ -231,12 +203,10 @@ body {
   }
 }
 
-/* Hide all craft levels by default */
 .craftLevel {
   display: none;
 }
 
-/* Only show the active one */
 .craftLevel.activeLevel {
   display: block;
 }
@@ -248,20 +218,8 @@ body {
   stroke-dasharray: 4 8;
 }
 
-.planet {
-  fill: #ffffff;
-  opacity: .5;
-}
-
-.planet--small {
-  fill: #ffffff;
-}
-
 #resetBtn {
-  /* Move it */
-  margin-left: auto;         /* pushes to far right */
-  
-  /* Enlarge & recolor */
+  margin-left: auto;
   padding: 14px 32px;
   font-size: 15px;
   font-weight: bold;
