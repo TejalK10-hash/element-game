@@ -1,12 +1,15 @@
 /* ============================================
    Element Navigator
    ============================================ */
+
+/* Reset all elements to border-box sizing and remove default margins/padding */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Main page background and font setup */
 body {
   background: #95e7fb;
   color: #ffffff;
@@ -14,7 +17,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---- header ---- */
+/* Header bar at the top of the page */
 #topbar {
   background: #151a25;
   padding: 16px 24px;
@@ -24,13 +27,14 @@ body {
   height: 80px;
 }
 
+/* Title text in the header */
 .brand {
   font-size: 24px;
   font-weight: bold;
   color: #ffffff;
 }
 
-/* ---- level tabs ---- */
+/* Container for the level selection buttons */
 #levelTabs {
   display: flex;
   gap: 8px;
@@ -38,6 +42,7 @@ body {
   margin: 20px 0;
 }
 
+/* Individual level tab button (default state) */
 .levelTab {
   background: #ffffff;
   color: #000000;
@@ -46,12 +51,13 @@ body {
   cursor: pointer;
 }
 
+/* Currently selected level tab */
 .levelTab.active {
   background: #ebed6b;
   color: #000000;
 }
 
-/* ---- scoreboard ---- */
+/* Score display bar below the tabs */
 #scoreboard {
   display: block;
   text-align: center;
@@ -59,7 +65,7 @@ body {
   color: #a20101;
 }
 
-/* ---- instructions ---- */
+/* How-to-play instructions text */
 #instructions {
   text-align: center;
   max-width: 600px;
@@ -67,7 +73,7 @@ body {
   color: #000000;
 }
 
-/* ---- game board (SVG) ---- */
+/* SVG game board - scales to fit screen width */
 #scene {
   width: 100%;
   max-width: 1000px;
@@ -75,31 +81,35 @@ body {
   margin: 0 auto;
 }
 
-/* ---- hotspots ---- */
+/* Orange dots marking clickable hotspots on the spacecraft images */
 .hotspotDot {
   fill: #ff9800;
 }
 
+/* Text labels next to each hotspot dot */
 .hotspotLabel {
   fill: #000000;
   font-size: 13px;
 }
 
+/* Green dot when a hotspot has been correctly matched */
 .hotspot.matched .hotspotDot {
   fill: #4df352;
 }
 
+/* Red flash when user drops an element on the wrong hotspot */
 .hotspot.wrong .hotspotDot {
   fill: #f44336;
 }
 
-/* ---- element badges ---- */
+/* Circular border around each draggable element badge */
 .badgeCircle {
   fill: rgba(255, 255, 255, 0.05);
   stroke: #000000;
   stroke-width: 3;
 }
 
+/* Chemical symbol text inside each badge (e.g. "Al", "Cu") */
 .badgeSymbol {
   fill: #000000;
   font-size: 20px;
@@ -107,35 +117,41 @@ body {
   text-anchor: middle;
 }
 
+/* Full material name text below each badge symbol */
 .badgeName {
   fill: #000000;
   font-size: 11px;
   text-anchor: middle;
 }
 
+/* Thicker glow border when user clicks to select a badge */
 .badge.selected .badgeCircle {
   stroke-width: 5;
   filter: drop-shadow(0 0 10px #e6f74f);
 }
 
+/* Fade out and disable clicks on badges that are already matched */
 .badge.matched {
   opacity: 0.3;
   pointer-events: none;
   color: #9deb4e;
 }
 
+/* Curved line drawn between a matched badge and its hotspot */
 .connectionLine {
   fill: none;
   stroke-width: 3;
   stroke-linecap: round;
 }
 
+/* Dashed line that follows the cursor while dragging */
 .dragLine {
   stroke-width: 2;
   stroke-dasharray: 6 6;
   opacity: 0.8;
 }
 
+/* Toast notification bar at bottom of screen (hidden by default) */
 #toast {
   position: fixed;
   bottom: 24px;
@@ -149,15 +165,22 @@ body {
   transition: opacity 0.2s;
 }
 
+/* Show the toast notification */
 #toast.show {
   opacity: 1;
 }
 
+/* Green left border for correct-match toasts */
 #toast.good {
-  /* TODO: style correct-match toasts */
   border-left: 3px solid #4caf50;
 }
 
+/* Yellow left border for surprise-fact toasts */
+#toast.surprise {
+  border-left: 3px solid #ffeb3b;
+}
+
+/* Modal overlay background (darkens the page) */
 .overlay {
   position: fixed;
   inset: 0;
@@ -169,11 +192,13 @@ body {
   pointer-events: none;
 }
 
+/* Make overlay visible and clickable */
 .overlay.show {
   opacity: 1;
   pointer-events: all;
 }
 
+/* Centered popup card inside the overlay */
 .modal {
   background: #1a1f2e;
   border: 1px solid #333;
@@ -183,6 +208,7 @@ body {
   text-align: center;
 }
 
+/* Generic button style used in all modals */
 .btn {
   background: #fff;
   color: #000;
@@ -192,25 +218,34 @@ body {
   margin-top: 16px;
 }
 
+/* Mobile adjustments for screens narrower than 640px */
 @media (max-width: 640px) {
   #topbar {
     flex-direction: column;
     gap: 8px;
+    height: auto;
+    padding: 12px;
   }
   .levelTab {
     padding: 8px 12px;
     font-size: 12px;
   }
+  .brand {
+    font-size: 18px;
+  }
 }
 
+/* Hide all craft levels by default */
 .craftLevel {
   display: none;
 }
 
+/* Show only the currently active craft level */
 .craftLevel.activeLevel {
   display: block;
 }
 
+/* Decorative dashed ellipse behind the spacecraft */
 .orbitRing {
   fill: #ffffff;
   stroke: rgba(255,255,255,.08);
@@ -218,6 +253,7 @@ body {
   stroke-dasharray: 4 8;
 }
 
+/* Reset button in the top-right corner of the header */
 #resetBtn {
   margin-left: auto;
   padding: 14px 32px;
@@ -228,4 +264,81 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* Background starfield container - fixed behind everything */
+#stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Individual twinkling star divs generated by JS */
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+/* Keyframes for the star twinkle opacity animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Streak counter span injected by game.js into the stats bar */
+.streakStat {
+  color: #fff;
+  margin-left: 16px;
+  font-size: 14px;
+}
+
+/* Small gray tag line in the fact modal (e.g. "Al · Fuel Tanks & Airframe") */
+.factCard .tag {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Large material name heading in the fact modal */
+.factCard .ttl {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+/* Body paragraph text in the fact modal */
+.factCard .body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+/* Individual glossary entry in the win screen */
+.glItem {
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+}
+
+/* Glossary entry heading (icon + symbol + name + use) */
+.glItem .h {
+  font-weight: bold;
+  color: #ebed6b;
+  margin-bottom: 4px;
+}
+
+/* Glossary entry description text */
+.glItem .b {
+  font-size: 13px;
+  color: #aaa;
 }
