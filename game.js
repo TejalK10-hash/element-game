@@ -1,23 +1,17 @@
-// game logic - started dec 2024, last touched jan 2025
-// TODO: clean up the streak logic, it's buggy on mobile
+// Element Navigator - game logic
 
 var DEBUG = true;
 
+// SVG canvas element where all game graphics live
 const svg = document.getElementById("scene");
+
+// Dashed line element that follows the cursor during drag
 const dragLine = document.getElementById("dragLine");
 
-// keeping score
-var score = 0; // global for quick access
+// Global score variable (also stored inside st.score)
+var score = 0;
 
-function checkMatch(element, hotspot) {
-    if (element == hotspot) { // == is fine here
-        score += 10;
-    } else {
-        score -= 5;
-    }
-}
-
-// ui refs
+// Cache references to DOM elements that get updated frequently
 var ui = {};
 ui.scoreVal = document.getElementById("scoreVal");
 ui.matchVal = document.getElementById("matchVal");
@@ -27,6 +21,7 @@ ui.craftNameLabel = document.getElementById("craftNameLabel");
 ui.toast = document.getElementById("toast");
 ui.streakVal = null;
 
+// Main game state object holding all mutable data
 var st = {
   score: 0,
   currentLevel: LEVELS[0].id,
@@ -38,45 +33,53 @@ var st = {
   mistakesByLevel: {}
 };
 
-// init lookup tables
-for (var i=0; i<LEVELS.length; i++) {
+// Initialize matchedByLevel and mistakesByLevel Sets/numbers for each level
+for (var i = 0; i < LEVELS.length; i++) {
   st.matchedByLevel[LEVELS[i].id] = new Set();
   st.mistakesByLevel[LEVELS[i].id] = 0;
 }
 
+// Look up a level object by its string id (e.g. "rocket", "shuttle")
 function levelById(id) { 
-  for (var i=0; i<LEVELS.length; i++) {
+  for (var i = 0; i < LEVELS.length; i++) {
     if (LEVELS[i].id === id) return LEVELS[i];
   }
   return null;
 }
 
+// Return the currently active level object
 function curLvl() { return levelById(st.currentLevel); }
 
+// Search all levels for an element with the given id string
 function elById(id) {
-  for (var i=0; i<LEVELS.length; i++) {
+  for (var i = 0; i < LEVELS.length; i++) {
     var found = LEVELS[i].elements.find(function(e){ return e.id == id; });
     if (found) return found;
   }
   return null;
 }
 
+// Find the element data that maps to a specific hotspot target string
 function hotspotEl(target) {
   return curLvl().elements.find(function(e){ return e.hotspot == target; });
 }
 
+// Check if every element in a given level has been matched
 function lvlComplete(id) {
   return st.matchedByLevel[id].size === levelById(id).elements.length;
 }
 
+// Count how many of the 4 levels are fully completed
 function countDone() {
   var n = 0;
-  for (var i=0; i<LEVELS.length; i++) {
+  for (var i = 0; i < LEVELS.length; i++) {
     if (lvlComplete(LEVELS[i].id)) n++;
   }
   return n;
 }
 
+// Calculate star rating (1-3) based on mistake count for a level
+// 0 mistakes = 3 stars, 1-2 mistakes = 2 stars, 3+ = 1 star
 function starsFor(id) {
   var m = st.mistakesByLevel[id];
   if (m == 0) return 3;
@@ -84,14 +87,15 @@ function starsFor(id) {
   return 1;
 }
 
+// Build a string of filled and empty stars for display (e.g. "⭐⭐☆")
 function starStr(n) {
   var out = "";
-  for (var i=0; i<n; i++) out += "⭐";
-  for (var i=0; i<3-n; i++) out += "☆";
+  for (var i = 0; i < n; i++) out += "⭐";
+  for (var i = 0; i < 3 - n; i++) out += "☆";
   return out;
 }
 
-// helper for svg coords
+// Convert a screen pixel coordinate to SVG coordinate space
 function svgPoint(clientX, clientY) {
   var pt = svg.createSVGPoint();
   pt.x = clientX;
@@ -99,36 +103,40 @@ function svgPoint(clientX, clientY) {
   return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
+// Parse the translate(x,y) transform on a badge group to get its center position
 function badgeCenter(id) {
   var g = svg.querySelector('.badge[data-id = "' + id + '"]');
   var m = /translate\(([-\d.]+)[, \s]+([-\d.]+)\)/.exec(g.getAttribute("transform"));
   return { x: parseFloat(m[1]), y: parseFloat(m[2]) };
 }
 
+// Read the cx/cy attributes of a hotspot dot circle element
 function hotspotCenter(target) {
   var dot = svg.querySelector('.hotspot[data-target = "' + target + '"] .hotspotDot');
   return { x: parseFloat(dot.getAttribute("cx")), y: parseFloat(dot.getAttribute("cy")) };
 }
 
+// Return the SVG <g class="connections"> element for the current level
 function connLayer() {
   return svg.querySelector('.craftLevel[data-level = "' + st.currentLevel + '"] .connections');
 }
 
+// Main initialization: set up UI, attach event listeners, preload images, start first level
 function init() {
   buildStars();
   initStreak();
-  
+
   if (DEBUG) console.log("game init, levels:", LEVELS.length);
 
   svg.querySelectorAll(".badge").forEach(function(badge){
     badge.addEventListener("pointerdown", onBadgeDown);
     badge.addEventListener("click", onBadgeClick);
   });
-  
+
   svg.querySelectorAll(".hotspot").forEach(function(hotspot){
     hotspot.addEventListener("click", onHotspotClick);
   });
-  
+
   document.querySelectorAll(".levelTab").forEach(function(tab){
     tab.addEventListener("click", function(){ switchLevel(tab.dataset.level); });
   });
@@ -141,6 +149,7 @@ function init() {
   switchLevel(st.currentLevel);
 }
 
+// Dynamically inject a streak counter span into the header stats bar
 function initStreak() {
   var statsBar = document.querySelector(".stats");
   if (!statsBar) return;
@@ -151,6 +160,7 @@ function initStreak() {
   ui.streakVal = document.getElementById("streakVal");
 }
 
+// Preload each level's spacecraft PNG so it fades in smoothly instead of popping
 function preloadCraftPhotos() {
   LEVELS.filter(function(l){ return l.photo; }).forEach(function(l){
     var group = svg.querySelector('.craftLevel[data-level = "' + l.id + '"] .craftArt');
@@ -159,12 +169,13 @@ function preloadCraftPhotos() {
     img.onerror = function(){ group.classList.remove("hasPhoto"); };
     img.src = l.photo;
   });
-  
+
   svg.querySelectorAll(".craftArt image.craftPhoto").forEach(function(img){
     img.addEventListener("load", function(){ img.setAttribute("opacity", "1"); });
   });
 }
 
+// Preload any custom badge images (none currently defined, but keeps the door open)
 function preloadBadgePhotos() {
   LEVELS.forEach(function(lvl){
     lvl.elements.filter(function(e){ return e.image; }).forEach(function(e){
@@ -176,12 +187,13 @@ function preloadBadgePhotos() {
       img.src = e.image;
     });
   });
-  
+
   svg.querySelectorAll(".badge image.badgePhoto").forEach(function(img){
     img.addEventListener("load", function(){ img.setAttribute("opacity", "1"); });
   });
 }
 
+// Generate 60 random twinkling star divs inside #stars for the background
 function buildStars() {
   var wrap = document.getElementById("stars");
   var n = 60;
@@ -198,6 +210,7 @@ function buildStars() {
   }
 }
 
+// Switch to a different level: hide old SVG group, show new one, update HUD
 function switchLevel(id) {
   st.currentLevel = id;
   st.selectedId = null;
@@ -206,7 +219,7 @@ function switchLevel(id) {
   svg.querySelectorAll(".craftLevel").forEach(function(g){
     g.classList.toggle("activeLevel", g.dataset.level === id);
   });
-  
+
   document.querySelectorAll(".levelTab").forEach(function(tab){
     tab.classList.toggle("active", tab.dataset.level === id);
   });
@@ -216,6 +229,7 @@ function switchLevel(id) {
   updateHud();
 }
 
+// Click handler for element badges: toggle selection state on/off
 function onBadgeClick(e) {
   if (st.dragging) return;
   var id = e.currentTarget.dataset.id;
@@ -224,6 +238,7 @@ function onBadgeClick(e) {
   refreshSel();
 }
 
+// Click handler for hotspot dots: if a badge is selected, attempt to match it
 function onHotspotClick(e) {
   var target = e.currentTarget.dataset.target;
   if (!st.selectedId) {
@@ -233,12 +248,14 @@ function onHotspotClick(e) {
   tryMatch(st.selectedId, target);
 }
 
+// Update the .selected CSS class on all badges based on st.selectedId
 function refreshSel() {
   svg.querySelectorAll(".badge").forEach(function(b){
     b.classList.toggle("selected", b.dataset.id === st.selectedId);
   });
 }
 
+// Pointer-down handler: start dragging a line from a badge to the cursor position
 function onBadgeDown(e) {
   var badge = e.currentTarget;
   var id = badge.dataset.id;
@@ -260,6 +277,7 @@ function onBadgeDown(e) {
   badge.addEventListener("pointercancel", onBadgeUp);
 }
 
+// Pointer-move handler: update the drag line endpoint to follow the cursor
 function onBadgeMove(e) {
   if (!st.dragging) return;
   st.dragging.moved = true;
@@ -268,6 +286,7 @@ function onBadgeMove(e) {
   dragLine.setAttribute("y2", p.y);
 }
 
+// Pointer-up handler: hide drag line, find nearest hotspot, attempt match if close enough
 function onBadgeUp(e) {
   var badge = e.currentTarget;
   badge.removeEventListener("pointermove", onBadgeMove);
@@ -283,7 +302,7 @@ function onBadgeUp(e) {
   var p = svgPoint(e.clientX, e.clientY);
   var closestTarget = null;
   var closestDist = Infinity;
-  
+
   svg.querySelectorAll('.craftLevel[data-level = "' + st.currentLevel + '"] .hotspot').forEach(function(h){
     var c = hotspotCenter(h.dataset.target);
     var d = Math.hypot(c.x - p.x, c.y - p.y);
@@ -296,11 +315,13 @@ function onBadgeUp(e) {
   }
 }
 
+// Core matching logic: check if element's hotspot matches the dropped target
 function tryMatch(elementId, target) {
   var el = elById(elementId);
   var hotspotEl = svg.querySelector('.craftLevel[data-level = "' + st.currentLevel + '"] .hotspot[data-target = "' + target + '"]');
 
   if (el.hotspot === target) {
+    // Correct match: record it, update score with streak bonus, draw connection line
     st.matchedByLevel[st.currentLevel].add(el.id);
 
     st.streak += 1;
@@ -326,6 +347,7 @@ function tryMatch(elementId, target) {
       showToast("✅ " + el.name + " correctly wired to " + el.use + "!", true);
     }
   } else {
+    // Wrong match: subtract 5 points, reset streak, increment mistake counter
     st.score = Math.max(0, st.score - 5);
     st.streak = 0;
     st.mistakesByLevel[st.currentLevel] += 1;
@@ -340,6 +362,7 @@ function tryMatch(elementId, target) {
   }
 }
 
+// Draw a quadratic bezier curve connecting a matched badge to its hotspot
 function drawConn(elementId, target) {
   var a = badgeCenter(elementId);
   var b = hotspotCenter(target);
@@ -352,6 +375,7 @@ function drawConn(elementId, target) {
   connLayer().appendChild(path);
 }
 
+// Refresh all HUD numbers: score, match count, total, levels done, streak
 function updateHud() {
   var lvl = curLvl();
   ui.scoreVal.textContent = st.score;
@@ -365,6 +389,7 @@ function updateHud() {
   });
 }
 
+// Show a temporary toast message at the bottom of the screen
 function showToast(msg, good) {
   ui.toast.textContent = msg;
   ui.toast.className = "show" + (good ? " good" : "");
@@ -372,6 +397,7 @@ function showToast(msg, good) {
   showToast._t = setTimeout(function(){ ui.toast.className = ""; }, 2200);
 }
 
+// Show a longer yellow-bordered toast with the element's surpriseFact
 function showSurpriseFact(el) {
   ui.toast.innerHTML = '✨ <b>Did you know?</b> ' + el.surpriseFact;
   ui.toast.className = "show good surprise";
@@ -379,6 +405,7 @@ function showSurpriseFact(el) {
   showToast._t = setTimeout(function(){ ui.toast.className = ""; }, 4500);
 }
 
+// Open the fact modal popup showing the matched element's name, symbol, and description
 function showFact(el) {
   document.getElementById("factHead").innerHTML =
     '<h1>✅ Connection Made!</h1><p class="sub">' + el.name + ' wired to ' + el.use + '.</p>';
@@ -389,11 +416,13 @@ function showFact(el) {
   document.getElementById("factOverlay").classList.add("show");
 }
 
+// Close the fact modal and check if the level or entire game is now complete
 document.getElementById("factContinueBtn").addEventListener("click", function(){
   document.getElementById("factOverlay").classList.remove("show");
   checkAfterFact();
 });
 
+// After closing a fact modal: show level-complete modal or win screen if done
 function checkAfterFact() {
   if (!lvlComplete(st.currentLevel)) return;
   if (countDone() === LEVELS.length) {
@@ -403,6 +432,7 @@ function checkAfterFact() {
   }
 }
 
+// Show the "Level Complete!" modal with star rating and next-level button
 function showLvlComplete(lvl) {
   var stars = starsFor(lvl.id);
   document.getElementById("levelCompleteText").innerHTML =
@@ -410,6 +440,7 @@ function showLvlComplete(lvl) {
   document.getElementById("levelOverlay").classList.add("show");
 }
 
+// "Next Level" button: close modal and jump to the first unfinished level
 document.getElementById("nextLevelBtn").addEventListener("click", function(){
   document.getElementById("levelOverlay").classList.remove("show");
   var next = null;
@@ -419,6 +450,7 @@ document.getElementById("nextLevelBtn").addEventListener("click", function(){
   if (next) switchLevel(next.id);
 });
 
+// Build and display the final win screen with score, stars, and full glossary
 function showWin() {
   document.getElementById("finalScore").textContent = st.score;
   var glossary = document.getElementById("winGlossary");
@@ -429,7 +461,7 @@ function showWin() {
   }
   html += '</div>';
   glossary.innerHTML = html;
-  
+
   LEVELS.forEach(function(lvl){
     lvl.elements.forEach(function(el){
       var item = document.createElement("div");
@@ -438,13 +470,15 @@ function showWin() {
       glossary.appendChild(item);
     });
   });
-  
+
   document.getElementById("winOverlay").classList.add("show");
 }
 
+// Attach reset handlers to both the header Reset button and Play Again button
 document.getElementById("playAgainBtn").addEventListener("click", resetGame);
 document.getElementById("resetBtn").addEventListener("click", resetGame);
 
+// Reset all game state to zero, clear connection lines, and restart at level 1
 function resetGame() {
   st.score = 0;
   st.matchedByLevel = {};
@@ -453,7 +487,7 @@ function resetGame() {
   st.streak = 0;
   st.bestStreak = 0;
   st.mistakesByLevel = {};
-  
+
   for (var i=0; i<LEVELS.length; i++) {
     st.matchedByLevel[LEVELS[i].id] = new Set();
     st.mistakesByLevel[LEVELS[i].id] = 0;
@@ -470,4 +504,5 @@ function resetGame() {
   switchLevel(LEVELS[0].id);
 }
 
+// Start the game
 init();
