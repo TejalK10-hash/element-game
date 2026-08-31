@@ -88,8 +88,9 @@ body {
 
 /* Text labels next to each hotspot dot */
 .hotspotLabel {
-  fill: #000000;
+  fill: #ffffff;
   font-size: 13px;
+  text-anchor: start;
 }
 
 /* Green dot when a hotspot has been correctly matched */
@@ -119,7 +120,7 @@ body {
 
 /* Full material name text below each badge symbol */
 .badgeName {
-  fill: #000000;
+  fill: #ffffff;
   font-size: 11px;
   text-anchor: middle;
 }
@@ -219,6 +220,24 @@ body {
 }
 
 /* Mobile adjustments for screens narrower than 640px */
+
+/* Semi-transparent background pill behind hotspot labels */
+.labelBg {
+  fill: rgba(0, 0, 0, 0.7);
+}
+
+/* Semi-transparent background pill behind badge names */
+.badgeNameBg {
+  fill: rgba(0, 0, 0, 0.65);
+}
+
+/* Badge circle stroke changed to white for contrast on dark bg */
+.badgeCircle {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: #000000;
+  stroke-width: 2.5;
+}
+
 @media (max-width: 640px) {
   #topbar {
     flex-direction: column;
