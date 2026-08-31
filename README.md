@@ -27,7 +27,7 @@ There are four levels: Rocket, Space Shuttle, Fighter Jet, and Space Probe.
 - JavaScript
 
 ## What Was Tricky
-The SVG coordinates for the hotspots took forever to get right. I had to adjust them pixel by pixel until the dots lined up with the images.
+The Scalable Vector Graphics (SVG) coordinates for the hotspots took forever to get right. I had to adjust them pixel by pixel until the dots lined up with the images.
 
 ## What's Next
 I want to add a submarine level next. Deep-sea pressure uses some wild alloys.
