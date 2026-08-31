@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- TODO: fix safari zoom issue on input focus -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title> Element Navigator: Connect the Tech</title>
+<title>Element Navigator: Connect the Tech</title>
 <link rel="stylesheet" href="style.css">
+<base target="_blank">
 </head>
 <body>
 
 <header id="topbar">
 <div class="brand">FROM ELEMENTS TO ENGINEERING MARVELS</div>
-<div class="stats">
-
-<button id="resetBtn" onclick="console.log('reset clicked')">Reset</button>
+<div class="stats"></div>
+<button id="resetBtn">Reset</button>
 </header>
 
 <main>
@@ -40,7 +39,6 @@
 <svg id="scene" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" touch-action="none">
 
 <defs>
-
 <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
 <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000814" flood-opacity="0.55"/>
 </filter>
@@ -54,18 +52,14 @@
 </filter>
 </defs>
 
-<!-- decorative orbit ring -->
 <ellipse cx="500" cy="300" rx="440" ry="180" class="orbitRing"/>
 
-<!-- ===================== dragLine (shared) ===================== -->
 <line id="dragLine" x1="0" y1="0" x2="0" y2="0" class="dragLine" visibility="hidden"/>
 
-<!-- =========================================================
-         LEVEL 1: ROCKET
-    ========================================================== -->
+<!-- ===================== ROCKET ===================== -->
 <g class="craftLevel" data-level="rocket">
 <g class="craftArt" filter="url(#softShadow)">
-<image class="craftPhoto" href="assets/rocket.png" x="30" y="-30" width="950" height="700" opacity="0"/>
+<image class="craftPhoto" href="rocket.png" x="30" y="-30" width="950" height="700" opacity="0"/>
 </g>
 
 <g class="connections"></g>
@@ -75,7 +69,6 @@
 <circle cx="677" cy="101" r="8" class="hotspotDot"/>
 <text x="691" y="110" class="hotspotLabel">Heatshield / Nose Cone</text>
 </g>
-
 <g class="hotspot" data-target="r_airframe">
 <circle cx="575" cy="210" r="8" class="hotspotDot"/>
 <text x="505" y="210" class="hotspotLabel">Airframe</text>
@@ -101,34 +94,32 @@
 <text y="52" class="badgeName">Aluminium-Lithium</text><text y="68" class="badgeName">Alloy</text>
 </g>
 <g class="badge" data-id="r_niobium" transform="translate(545,52)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fca5a5"/>
 <text class="badgeSymbol">Nb</text>
 <text y="52" class="badgeName">Niobium</text>
 </g>
 <g class="badge" data-id="r_copper" transform="translate(305,52)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fb923c"/>
 <text class="badgeSymbol">Cu</text>
 <text y="52" class="badgeName">Copper</text>
 </g>
 <g class="badge" data-id="r_carbon" transform="translate(183,52)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#cbd5e1"/>
 <text class="badgeSymbol">C</text>
 <text y="52" class="badgeName">Carbon</text>
 </g>
 <g class="badge" data-id="r_propellant" transform="translate(52,52)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#facc15"/>
 <text class="badgeSymbol">H2(L)/</text><text y="25" class="badgeSymbol">O2(L)</text>
 <text y="52" class="badgeName">Liquid Hydrogen /</text><text y="68" class="badgeName">Liquid Oxygen</text>
 </g>
 </g>
 </g>
 
-<!-- =========================================================
-         LEVEL 2: SPACE SHUTTLE
-    ========================================================== -->
+<!-- ===================== SPACE SHUTTLE ===================== -->
 <g class="craftLevel" data-level="shuttle">
 <g class="craftArt" filter="url(#softShadow)">
-<image class="craftPhoto" href="assets/shuttle.png" x="30" y="0" width="950" height="620" opacity="0"/>
+<image class="craftPhoto" href="shuttle.png" x="30" y="0" width="950" height="620" opacity="0"/>
 </g>
 
 <g class="connections"></g>
@@ -158,12 +149,12 @@
 
 <g class="badges">
 <g class="badge" data-id="s_rcc" transform="translate(100,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#e2e8f0"/>
 <text class="badgeSymbol">RCC</text>
 <text y="52" class="badgeName">Reinforced Carbon-Carbon</text>
 </g>
 <g class="badge" data-id="s_silica" transform="translate(346,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fca5a5"/>
 <text class="badgeSymbol">SiO_2</text>
 <text y="52" class="badgeName">Silica</text>
 </g>
@@ -173,24 +164,22 @@
 <text y="52" class="badgeName">Aluminum</text>
 </g>
 <g class="badge" data-id="s_inconel" transform="translate(469,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fb923c"/>
 <text class="badgeSymbol">Ni-Cr</text>
 <text y="52" class="badgeName">Inconel</text>
 </g>
 <g class="badge" data-id="s_nomex" transform="translate(590,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#c084fc"/>
 <text class="badgeSymbol">Nmx</text>
 <text y="52" class="badgeName">Nomex</text>
 </g>
 </g>
 </g>
 
-<!-- =========================================================
-         LEVEL 3: FIGHTER JET
-    ========================================================== -->
+<!-- ===================== FIGHTER JET ===================== -->
 <g class="craftLevel" data-level="jet">
 <g class="craftArt" filter="url(#softShadow)">
-<image class="craftPhoto" href="assets/jet.png" x="30" y="0" width="950" height="620" opacity="0"/>
+<image class="craftPhoto" href="jet.png" x="30" y="0" width="950" height="620" opacity="0"/>
 </g>
 
 <g class="connections"></g>
@@ -220,39 +209,37 @@
 
 <g class="badges">
 <g class="badge" data-id="hyp_hafnium_carbide" transform="translate(120,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#B87333"/>
 <text class="badgeSymbol">HfC</text>
 <text y="52" class="badgeName">Hafnium Carbide</text>
 </g>
 <g class="badge" data-id="hyp_titanium_aluminide" transform="translate(265,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#C0D6E4"/>
 <text class="badgeSymbol">TiAl</text>
 <text y="52" class="badgeName">Titanium Aluminide</text>
 </g>
 <g class="badge" data-id="hyp_silicon_carbide" transform="translate(410,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#36454F"/>
 <text class="badgeSymbol">SiC</text>
 <text y="52" class="badgeName">Silicon Carbide</text>
 </g>
 <g class="badge" data-id="hyp_rhenium_niobium" transform="translate(552,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#9B59B6"/>
 <text class="badgeSymbol">ReNb</text>
 <text y="52" class="badgeName">Rhenium Niobium</text>
 </g>
 <g class="badge" data-id="hyp_rhenium_nickel" transform="translate(695,55)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#BDC3C7"/>
 <text class="badgeSymbol">ReNi</text>
 <text y="52" class="badgeName">Rhenium Nickel</text>
 </g>
 </g>
 </g>
 
-<!-- =========================================================
-         LEVEL 4: SPACE PROBE
-    ========================================================== -->
+<!-- ===================== SPACE PROBE ===================== -->
 <g class="craftLevel" data-level="probe">
 <g class="craftArt" filter="url(#softShadow)">
-<image class="craftPhoto" href="assets/probe.png" x="30" y="0" width="950" height="620" opacity="0"/>
+<image class="craftPhoto" href="probe.png" x="30" y="0" width="950" height="620" opacity="0"/>
 </g>
 
 <g class="connections"></g>
@@ -282,7 +269,7 @@
 
 <g class="badges">
 <g class="badge" data-id="pb_plutonium" transform="translate(198,45)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fb923c"/>
 <text class="badgeSymbol">Pu</text>
 <text y="52" class="badgeName">Plutonium</text>
 </g>
@@ -292,17 +279,17 @@
 <text y="52" class="badgeName">Xenon</text>
 </g>
 <g class="badge" data-id="pb_tantalum" transform="translate(489.5,45)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#c084fc"/>
 <text class="badgeSymbol">Ta</text>
 <text y="52" class="badgeName">Tantalum</text>
 </g>
 <g class="badge" data-id="pb_beryllium" transform="translate(634,45)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#e2e8f0"/>
 <text class="badgeSymbol">Be</text>
 <text y="52" class="badgeName">Beryllium</text>
 </g>
 <g class="badge" data-id="pb_gold" transform="translate(778,45)">
-<circle r="36" class="badgeCircle" style="--c:#7dd3fc"/>
+<circle r="36" class="badgeCircle" style="--c:#fbbf24"/>
 <text class="badgeSymbol">Au</text>
 <text y="52" class="badgeName">Gold</text>
 </g>
@@ -342,7 +329,6 @@
 
 <div id="toast"></div>
 
-<!-- TODO: add more levels here -->
 <script src="data.js"></script>
 <script src="game.js"></script>
 <script>console.log('page loaded v1.2');</script>
