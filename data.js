@@ -1,6 +1,8 @@
 // ============================================================
 // LEVEL + ELEMENT DATA
 // ============================================================
+// This array defines all 4 game levels, each with 5 elements.
+// Each element maps a chemical material to a hotspot on the SVG image.
 
 const LEVELS = [
   {
@@ -19,7 +21,6 @@ const LEVELS = [
         color: "#7dd3fc",
         fact: "Aluminum-lithium alloy is stupid light but still strong. Every pound shaved off the tanks and frame is a pound more payload you can launch. That is why it is the go-to for rocket structures like the Space Shuttle's external tank.",
         surpriseFact: "Lithium is so light it floats on water. Mix it with aluminum and you get a metal that barely feels like metal."
-
       },
       {
         id: "r_niobium",
@@ -130,54 +131,54 @@ const LEVELS = [
     photo: "jet.png",
     elements: [
       {
-        "id": "hyp_hafnium_carbide",
-        "symbol": "HfC",
-        "name": "Hafnium Carbide",
-        "hotspot": "hyp_leading_edge",
-        "use": "Leading Edges",
-        "color": "#B87333",
-        "fact": "Hafnium carbide melts around 3,900°C — one of the highest melting points of any known compound. That is 700°C hotter than the surface of Mercury. It is basically the only thing that can survive on the razor-thin leading edges slicing through hypersonic air.",
-        "surpriseFact": "Hafnium is named after Hafnia, the old Latin name for Copenhagen, where it was discovered in 1923."
+        id: "hyp_hafnium_carbide",
+        symbol: "HfC",
+        name: "Hafnium Carbide",
+        hotspot: "hyp_leading_edge",
+        use: "Leading Edges",
+        color: "#B87333",
+        fact: "Hafnium carbide melts around 3,900°C — one of the highest melting points of any known compound. That is 700°C hotter than the surface of Mercury. It is basically the only thing that can survive on the razor-thin leading edges slicing through hypersonic air.",
+        surpriseFact: "Hafnium is named after Hafnia, the old Latin name for Copenhagen, where it was discovered in 1923."
       },
       {
-        "id": "hyp_titanium_aluminide",
-        "symbol": "TiAl",
-        "name": "Titanium Aluminide",
-        "hotspot": "hyp_airframe",
-        "use": "Airframe Skin",
-        "color": "#C0D6E4",
-        "fact": "Titanium aluminide is about half the density of normal titanium alloys but keeps its strength at temperatures that turn standard aerospace metals to mush. It is what keeps hypersonic vehicles light enough to fly and tough enough to survive.",
-        "surpriseFact": "Titanium is so corrosion-resistant it is also used in body piercings and hip replacements. The same metal in hypersonic jets lives in some human joints."
+        id: "hyp_titanium_aluminide",
+        symbol: "TiAl",
+        name: "Titanium Aluminide",
+        hotspot: "hyp_airframe",
+        use: "Airframe Skin",
+        color: "#C0D6E4",
+        fact: "Titanium aluminide is about half the density of normal titanium alloys but keeps its strength at temperatures that turn standard aerospace metals to mush. It is what keeps hypersonic vehicles light enough to fly and tough enough to survive.",
+        surpriseFact: "Titanium is so corrosion-resistant it is also used in body piercings and hip replacements. The same metal in hypersonic jets lives in some human joints."
       },
       {
-        "id": "hyp_silicon_carbide",
-        "symbol": "SiC",
-        "name": "Silicon Carbide",
-        "hotspot": "hyp_thermal",
-        "use": "Thermal Protection Tiles",
-        "color": "#36454F",
-        "fact": "Silicon carbide handles re-entry-level heat that would vaporize most metals. It acts as featherweight outer armor, insulating the vehicle's core structure and turning lethal thermal energy into something survivable.",
-        "surpriseFact": "Silicon carbide occurs naturally in meteorites and was once mistaken for diamonds when found in an Arizona crater."
+        id: "hyp_silicon_carbide",
+        symbol: "SiC",
+        name: "Silicon Carbide",
+        hotspot: "hyp_thermal",
+        use: "Thermal Protection Tiles",
+        color: "#36454F",
+        fact: "Silicon carbide handles re-entry-level heat that would vaporize most metals. It acts as featherweight outer armor, insulating the vehicle's core structure and turning lethal thermal energy into something survivable.",
+        surpriseFact: "Silicon carbide occurs naturally in meteorites and was once mistaken for diamonds when found in an Arizona crater."
       },
       {
-        "id": "hyp_rhenium_niobium",
-        "symbol": "Re+Nb",
-        "name": "Rhenium-Coated Niobium",
-        "hotspot": "hyp_combustor",
-        "use": "Scramjet Combustor Walls",
-        "color": "#9B59B6",
-        "fact": "Rhenium is rarer than gold. Coated over niobium, it raises the effective melting point so dramatically that the scramjet combustor survives continuous supersonic combustion. It is holding back an inferno that would burn through nearly anything else in seconds.",
-        "surpriseFact": "Rhenium was one of the last stable elements ever discovered, isolated in 1925, and it is still one of the rarest metals on Earth."
+        id: "hyp_rhenium_niobium",
+        symbol: "Re+Nb",
+        name: "Rhenium-Coated Niobium",
+        hotspot: "hyp_combustor",
+        use: "Scramjet Combustor Walls",
+        color: "#9B59B6",
+        fact: "Rhenium is rarer than gold. Coated over niobium, it raises the effective melting point so dramatically that the scramjet combustor survives continuous supersonic combustion. It is holding back an inferno that would burn through nearly anything else in seconds.",
+        surpriseFact: "Rhenium was one of the last stable elements ever discovered, isolated in 1925, and it is still one of the rarest metals on Earth."
       },
       {
-        "id": "hyp_rhenium_nickel",
-        "symbol": "Re+Ni",
-        "name": "Rhenium-Nickel Superalloy",
-        "hotspot": "hyp_turbine",
-        "use": "Engine Turbine Blades",
-        "color": "#BDC3C7",
-        "fact": "Above 1,100°C, ordinary steel softens like warm clay. Rhenium-nickel superalloys resist 'creep' — the slow deformation under heat and stress — so turbine blades can spin at hypersonic engine speeds without warping into useless metal spaghetti.",
-        "surpriseFact": "The 'gamma-prime' phase that makes nickel superalloys so strong was discovered somewhat by accident during 1940s jet engine research."
+        id: "hyp_rhenium_nickel",
+        symbol: "Re+Ni",
+        name: "Rhenium-Nickel Superalloy",
+        hotspot: "hyp_turbine",
+        use: "Engine Turbine Blades",
+        color: "#BDC3C7",
+        fact: "Above 1,100°C, ordinary steel softens like warm clay. Rhenium-nickel superalloys resist 'creep' — the slow deformation under heat and stress — so turbine blades can spin at hypersonic engine speeds without warping into useless metal spaghetti.",
+        surpriseFact: "The 'gamma-prime' phase that makes nickel superalloys so strong was discovered somewhat by accident during 1940s jet engine research."
       }
     ]
   },
